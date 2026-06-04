@@ -8,50 +8,65 @@
 <title>Gestion des Permanences</title>
 <style>
 :root{
-  --bg:#e9ebee; --surface:#ffffff; --surface-2:#f4f5f7;
+  --bg:#e9ebee; --surface:#ffffff; --surface-2:#f4f5f7; --we:#eef0f3;
   --ink:#1c2530; --ink-2:#586170; --ink-3:#8a929d;
   --line:#d3d8df; --line-2:#c2c8d1; --line-strong:#aab2bd;
   --slate:#1b2533; --slate-2:#283549;
   --accent:#2f5277; --accent-2:#264362; --accent-soft:#e7edf3; --accent-ink:#24405f;
-  --danger:#b23b3b; --danger-soft:#f7ebeb; --ok:#2f7d57;
+  --danger:#b23b3b; --danger-soft:#f7ebeb; --ok:#2f7d57; --warn:#c47a1c;
   --r:4px; --r-sm:3px;
   --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
   --mono:ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
 }
+body.dark{
+  --bg:#10151c; --surface:#171f2a; --surface-2:#1e2733; --we:#1a232f;
+  --ink:#e9eef5; --ink-2:#aab4c2; --ink-3:#7c8796;
+  --line:#28323f; --line-2:#36424f; --line-strong:#4a5868;
+  --slate:#0b1016; --slate-2:#18212e;
+  --accent:#5a86c8; --accent-2:#6f99d6; --accent-soft:#1b2a3e; --accent-ink:#a9c4ea;
+  --danger:#e07070; --danger-soft:#3a2323; --ok:#46b07e; --warn:#d2933c;
+}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;height:100%}
+html,body{margin:0;min-height:100%}
 body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14.5px;line-height:1.5;
-  -webkit-font-smoothing:antialiased;padding-bottom:76px}
+  -webkit-font-smoothing:antialiased;padding-bottom:96px;transition:background .2s,color .2s}
 h1,h2,h3{margin:0;font-weight:600}
 button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
 input,select,textarea{font-family:inherit}
 .hidden{display:none!important}
 .tnum{font-variant-numeric:tabular-nums}
+svg{display:block}
 
 /* header */
 header.app{position:sticky;top:0;z-index:30;background:var(--slate);color:#eef1f5;
-  padding:max(12px,env(safe-area-inset-top)) 16px 12px;border-bottom:1px solid #000}
-header.app .row{display:flex;align-items:center;gap:11px;max-width:840px;margin:0 auto}
+  padding:max(12px,env(safe-area-inset-top)) 14px 12px}
+header.app .row{display:flex;align-items:center;gap:10px;max-width:900px;margin:0 auto}
 .mono-mark{width:34px;height:34px;flex:0 0 auto;border:1px solid #ffffff26;background:#ffffff0d;
   display:grid;place-items:center;border-radius:var(--r-sm)}
-.h-t{font-size:14.5px;font-weight:600;letter-spacing:.01em;line-height:1.1}
-.h-s{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:#93a1b8;margin-top:2px}
-.h-right{margin-left:auto;display:flex;align-items:center;gap:12px}
-.sync{font-size:10.5px;letter-spacing:.04em;color:#93a1b8;display:flex;align-items:center;gap:5px}
+.h-t{font-size:14px;font-weight:600;line-height:1.1}
+.h-s{font-size:9.5px;letter-spacing:.15em;text-transform:uppercase;color:#93a1b8;margin-top:2px}
+.h-right{margin-left:auto;display:flex;align-items:center;gap:9px}
+.bell{position:relative;width:34px;height:34px;border:1px solid #ffffff26;border-radius:var(--r-sm);display:grid;place-items:center;color:#cdd6e3}
+.bell:hover{background:#ffffff14}
+.bell svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.7}
+.nbadge{position:absolute;top:-5px;right:-5px;min-width:16px;height:16px;padding:0 4px;border-radius:9px;
+  background:var(--danger);color:#fff;font-size:10px;font-weight:700;display:grid;place-items:center;border:1px solid var(--slate)}
+.sync{font-size:10px;letter-spacing:.03em;color:#93a1b8;display:flex;align-items:center;gap:5px}
 .sync .d{width:7px;height:7px;border-radius:50%;background:#5c6b82}
 .sync.ok .d{background:#46b07e}.sync.off .d{background:#c98a3a}
-.h-user{font-size:11px;color:#c4ccd8;border-left:1px solid #ffffff1f;padding-left:11px;line-height:1.2}
-.h-user b{color:#fff;font-weight:600;display:block;font-size:12px}
-.logout{font-size:11px;color:#93a1b8;border:1px solid #ffffff26;border-radius:var(--r-sm);padding:6px 9px}
+.h-user{font-size:10.5px;color:#c4ccd8;border-left:1px solid #ffffff1f;padding-left:9px;line-height:1.2;max-width:120px}
+.h-user b{color:#fff;font-weight:600;display:block;font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.h-user .rl{font-size:9px;text-transform:uppercase;letter-spacing:.05em;color:#8fb0d8}
+.logout{font-size:11px;color:#93a1b8;border:1px solid #ffffff26;border-radius:var(--r-sm);padding:6px 8px}
 .logout:hover{background:#ffffff14;color:#fff}
 
 /* layout */
-main{max-width:840px;margin:0 auto;padding:16px 14px 6px}
+main{max-width:900px;margin:0 auto;padding:16px 14px 6px}
 .screen{animation:fade .2s ease}
 @keyframes fade{from{opacity:0}to{opacity:1}}
 .screen-h{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin:0 0 16px;
   padding-bottom:13px;border-bottom:1px solid var(--line)}
-.screen-h h2{font-size:19px;font-weight:600;letter-spacing:-.01em}
+.screen-h h2{font-size:19px;font-weight:600}
 .screen-h .sub{color:var(--ink-2);font-size:12px;margin-top:3px}
 
 /* cards */
@@ -60,12 +75,11 @@ main{max-width:840px;margin:0 auto;padding:16px 14px 6px}
 
 /* forms */
 label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-2);font-weight:600;margin:13px 0 5px}
-.fld{width:100%;background:#fff;border:1px solid var(--line-2);color:var(--ink);border-radius:var(--r-sm);
+.fld{width:100%;background:var(--surface);border:1px solid var(--line-2);color:var(--ink);border-radius:var(--r-sm);
   padding:10px 11px;font-size:14.5px;transition:border-color .12s,box-shadow .12s}
 .fld:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+.fld:disabled{background:var(--surface-2);color:var(--ink-2)}
 textarea.fld{min-height:74px;resize:vertical}
-select.fld{appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--ink-3) 50%),linear-gradient(135deg,var(--ink-3) 50%,transparent 50%);
-  background-position:calc(100% - 16px) center,calc(100% - 11px) center;background-size:5px 5px,5px 5px;background-repeat:no-repeat;padding-right:30px}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 
 /* buttons */
@@ -73,10 +87,10 @@ select.fld{appearance:none;background-image:linear-gradient(45deg,transparent 50
   font-size:14px;width:100%;transition:background .12s,transform .04s;border:1px solid var(--accent)}
 .btn:hover{background:var(--accent-2);border-color:var(--accent-2)}
 .btn:active{transform:translateY(1px)}
-.btn.dark{background:var(--slate);border-color:var(--slate)}.btn.dark:hover{background:var(--slate-2);border-color:var(--slate-2)}
-.btn.sec{background:#fff;color:var(--ink);border:1px solid var(--line-2)}
+.btn.dark{background:var(--slate);border-color:var(--slate);color:#fff}.btn.dark:hover{background:var(--slate-2);border-color:var(--slate-2)}
+.btn.sec{background:var(--surface);color:var(--ink);border:1px solid var(--line-2)}
 .btn.sec:hover{background:var(--surface-2);border-color:var(--line-strong)}
-.btn.danger{background:#fff;color:var(--danger);border:1px solid #e0b6b6}.btn.danger:hover{background:var(--danger-soft)}
+.btn.danger{background:var(--surface);color:var(--danger);border:1px solid var(--danger)}.btn.danger:hover{background:var(--danger-soft)}
 .btn.sm{width:auto;padding:8px 13px;font-size:13px}
 .btn-row{display:flex;gap:9px;margin-top:15px}.btn-row .btn{width:auto;flex:1}
 .act{background:var(--accent);color:#fff;border:1px solid var(--accent);border-radius:var(--r-sm);
@@ -93,41 +107,47 @@ select.fld{appearance:none;background-image:linear-gradient(45deg,transparent 50
 .item .chev{color:var(--ink-3);font-size:16px}
 .badge{width:44px;height:44px;border-radius:var(--r-sm);flex:0 0 auto;display:grid;place-items:center;
   font-weight:700;font-size:13px;letter-spacing:.5px;color:#fff}
+.rolepill{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:3px 8px;border-radius:99px}
+.rolepill.admin{background:var(--accent-soft);color:var(--accent-ink)}
+.rolepill.user{background:var(--surface-2);color:var(--ink-2);border:1px solid var(--line)}
 .empty{text-align:center;color:var(--ink-2);padding:40px 16px;background:var(--surface);
   border:1px solid var(--line);border-radius:var(--r)}
-.empty .ic{display:block;margin:0 auto 12px;color:var(--ink-3)}
+.empty .ic{margin:0 auto 12px;color:var(--ink-3)}
 .empty .sm{font-size:12px;color:var(--ink-3);margin-top:5px}
 
 /* segmented */
 .seg{display:inline-flex;border:1px solid var(--line-2);border-radius:var(--r-sm);overflow:hidden;margin-bottom:15px}
-.seg button{padding:8px 16px;font-size:13px;font-weight:600;color:var(--ink-2);background:#fff;border-right:1px solid var(--line-2)}
+.seg button{padding:8px 16px;font-size:13px;font-weight:600;color:var(--ink-2);background:var(--surface);border-right:1px solid var(--line-2)}
 .seg button:last-child{border-right:none}
 .seg button.on{background:var(--accent);color:#fff}
 
 /* calendar */
 .calbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:13px;gap:8px}
-.calbar .mlabel{font-size:16px;font-weight:600;text-transform:capitalize;letter-spacing:-.01em}
-.navbtn{width:34px;height:34px;border:1px solid var(--line-2);background:#fff;color:var(--ink);
+.calbar .mlabel{font-size:16px;font-weight:600;text-transform:capitalize}
+.navbtn{width:34px;height:34px;border:1px solid var(--line-2);background:var(--surface);color:var(--ink);
   font-size:16px;display:grid;place-items:center;border-radius:var(--r-sm)}
 .navbtn:hover{background:var(--surface-2)}
-.today-btn{padding:8px 12px;border:1px solid var(--line-2);background:#fff;font-size:12px;font-weight:600;
+.today-btn{padding:8px 12px;border:1px solid var(--line-2);background:var(--surface);font-size:12px;font-weight:600;
   color:var(--accent-ink);border-radius:var(--r-sm)}.today-btn:hover{background:var(--surface-2)}
 .cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
 .cal .dow{text-align:center;font-size:10px;color:var(--ink-3);font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding-bottom:3px}
-.day{background:#fff;border:1px solid var(--line);border-radius:var(--r-sm);min-height:68px;padding:5px 4px;position:relative;overflow:hidden}
+.day{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-sm);min-height:68px;padding:5px 4px;position:relative;overflow:hidden}
 .day.out{background:var(--surface-2);color:var(--ink-3)}
-.day.we{background:#eef0f3}
+.day.we{background:var(--we)}
 .day.today{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
 .day .num{font-size:11px;color:var(--ink-2);font-weight:700;text-align:right;padding-right:1px;margin-bottom:3px}
 .day.today .num{color:var(--accent)}
 .pill{font-size:9px;font-weight:700;color:#fff;border-radius:2px;padding:2px 3px;margin-bottom:2px;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.25;letter-spacing:.2px}
 .day .more{font-size:9px;color:var(--ink-3);font-weight:600}
-.mdot{position:absolute;right:4px;top:5px;width:5px;height:5px;background:var(--accent);border:1px solid #fff}
+.mdot{position:absolute;right:4px;top:5px;width:5px;height:5px;background:var(--accent);border:1px solid var(--surface)}
+.legend{display:flex;flex-wrap:wrap;gap:9px}
+.legend span{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--ink-2)}
+.legend i{width:11px;height:11px;border-radius:2px;flex:0 0 auto}
 
 /* day detail */
 .dayblock{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:13px;margin-bottom:11px}
-.dayblock .dh{display:flex;align-items:center;justify-content:space-between;margin-bottom:11px}
+.dayblock .dh{display:flex;align-items:center;justify-content:space-between;margin-bottom:11px;gap:8px}
 .dayblock .dt{font-size:15px;font-weight:600;text-transform:capitalize}
 .dayblock .dt small{font-size:10px;color:var(--accent-ink);font-weight:700;background:var(--accent-soft);
   padding:2px 7px;border-radius:2px;margin-left:8px;text-transform:uppercase;letter-spacing:.05em}
@@ -138,55 +158,70 @@ select.fld{appearance:none;background-image:linear-gradient(45deg,transparent 50
 .cdot{width:9px;height:9px;flex:0 0 auto;border-radius:1px}
 .tris{display:flex;flex-wrap:wrap;gap:5px}
 .tag{padding:4px 9px;border-radius:2px;font-weight:700;font-size:12px;color:#fff;letter-spacing:.4px}
-.tag.ed{cursor:pointer}.tag.ed:hover{filter:brightness(1.1)}
+.tag.ed{cursor:pointer}.tag.ed:hover{filter:brightness(1.12)}
 .nofill{color:var(--ink-3);font-size:12px;font-style:italic}
 .mline{font-size:12.5px;margin:5px 0;color:var(--ink);cursor:pointer}.mline:hover{color:var(--accent-ink)}
 .mline b{font-weight:600}
 
 /* chips */
 .agpick{display:flex;flex-wrap:wrap;gap:7px;margin-top:5px}
-.chip{border:1px solid var(--line-2);border-radius:var(--r-sm);padding:7px 11px;font-size:12.5px;font-weight:600;background:#fff;color:var(--ink-2)}
+.chip{border:1px solid var(--line-2);border-radius:var(--r-sm);padding:7px 11px;font-size:12.5px;font-weight:600;background:var(--surface);color:var(--ink-2)}
 .chip.on{background:var(--slate);color:#fff;border-color:var(--slate)}
+body.dark .chip.on{background:var(--accent);border-color:var(--accent)}
 
-/* colors settings */
+/* color settings */
 .crow{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
 .crow:last-child{border-bottom:none}
 .crow .sw{width:40px;height:40px;border-radius:var(--r-sm);display:grid;place-items:center;color:#fff;font-weight:700;font-size:11px}
 .crow .lab{flex:1}.crow .lab .nm{font-weight:600;font-size:14px}.crow .lab .hex{font-size:11px;color:var(--ink-3);font-family:var(--mono)}
-input[type=color]{width:46px;height:38px;padding:2px;border:1px solid var(--line-2);border-radius:var(--r-sm);background:#fff;cursor:pointer}
+input[type=color]{width:46px;height:38px;padding:2px;border:1px solid var(--line-2);border-radius:var(--r-sm);background:var(--surface);cursor:pointer}
+
+/* toggle */
+.switch{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.switch .lab{font-weight:600;font-size:14px}
+.tog{width:46px;height:26px;border-radius:99px;background:var(--line-2);position:relative;transition:background .15s;flex:0 0 auto}
+.tog.on{background:var(--accent)}
+.tog::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .15s}
+.tog.on::after{left:23px}
 
 /* modal */
-.overlay{position:fixed;inset:0;background:rgba(20,28,40,.45);z-index:50;display:flex;align-items:flex-end;justify-content:center;animation:fade .15s}
+.overlay{position:fixed;inset:0;background:rgba(15,20,30,.5);z-index:50;display:flex;align-items:flex-end;justify-content:center;animation:fade .15s}
 .modal{background:var(--surface);border-radius:var(--r) var(--r) 0 0;width:100%;max-width:560px;max-height:92vh;
-  overflow:auto;padding:6px 16px calc(20px + env(safe-area-inset-bottom));border-top:1px solid var(--line)}
+  overflow:auto;padding:6px 16px calc(22px + env(safe-area-inset-bottom));border-top:1px solid var(--line)}
 @media(min-width:620px){.overlay{align-items:center}.modal{border-radius:var(--r);border:1px solid var(--line)}}
 .modal .grab{width:40px;height:3px;border-radius:2px;background:var(--line-2);margin:8px auto 15px}
 .modal h3{font-size:17px;font-weight:600}
 .modal .msub{color:var(--ink-2);font-size:12.5px;margin:3px 0 5px}
-.modal textarea.code{font-family:var(--mono);font-size:11.5px;min-height:210px}
+
+/* notifications */
+.notif{display:flex;gap:10px;padding:11px 0;border-bottom:1px solid var(--line)}
+.notif:last-child{border-bottom:none}
+.notif .ndot{width:8px;height:8px;border-radius:50%;background:var(--accent);margin-top:5px;flex:0 0 auto}
+.notif.read .ndot{background:var(--line-2)}
+.notif .nt{font-size:13.5px}
+.notif .nm2{font-size:11px;color:var(--ink-3);margin-top:2px}
 
 /* nav */
-nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:40;display:flex;background:#fff;border-top:1px solid var(--line-2);padding-bottom:env(safe-area-inset-bottom)}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:40;display:flex;background:var(--surface);border-top:1px solid var(--line-2);padding-bottom:env(safe-area-inset-bottom)}
 nav.tabs .tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;font-weight:600;
   color:var(--ink-3);padding:9px 2px 8px;border-top:2px solid transparent;text-transform:uppercase;letter-spacing:.03em}
 nav.tabs .tab svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.7}
 nav.tabs .tab.on{color:var(--accent);border-top-color:var(--accent)}
 
 /* toast */
-.toast{position:fixed;left:50%;bottom:92px;transform:translateX(-50%);background:var(--slate);color:#fff;
-  padding:10px 18px;border-radius:var(--r-sm);font-size:13px;z-index:80;box-shadow:0 6px 20px rgba(20,28,40,.3)}
+.toast{position:fixed;left:50%;bottom:100px;transform:translateX(-50%);background:var(--slate);color:#fff;
+  padding:10px 18px;border-radius:var(--r-sm);font-size:13px;z-index:80;box-shadow:0 6px 20px rgba(0,0,0,.35)}
 .note{font-size:11.5px;color:var(--ink-3);margin-top:8px;line-height:1.55}
 .tablebar{display:flex;gap:8px;flex-wrap:wrap}
-.legend{display:flex;flex-wrap:wrap;gap:9px}.legend span{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--ink-2)}
 
 /* login */
 .login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
 .login-card{width:100%;max-width:360px}
 .login .top{text-align:center;margin-bottom:24px}
-.login .mono-mark{width:54px;height:54px;margin:0 auto 14px;border:1px solid var(--line-2);background:#fff}
+.login .mono-mark{width:54px;height:54px;margin:0 auto 14px;border:1px solid var(--line-2);background:var(--surface)}
 .login h1{font-size:19px;font-weight:600;color:var(--ink)}
 .login .tl{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3);margin-top:5px}
-.login .panel{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:18px}
+.login .panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px}
 .login .sec-line{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--ink-2);margin-top:14px;justify-content:center}
 .login .msg{font-size:12px;text-align:center;margin-top:10px;min-height:16px;color:var(--accent-ink)}
 .login .msg.err{color:var(--danger)}
@@ -203,9 +238,7 @@ details.cfg summary::-webkit-details-marker{display:none}
 <div id="login" class="login">
   <div class="login-card">
     <div class="top">
-      <div class="mono-mark">
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#2f5277" stroke-width="1.6"><path d="M12 2 4 6v6c0 4 3.5 7 8 8 4.5-1 8-4 8-8V6l-8-4Z"/><path d="m9 12 2 2 4-4"/></svg>
-      </div>
+      <div class="mono-mark"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#2f5277" stroke-width="1.6"><path d="M12 2 4 6v6c0 4 3.5 7 8 8 4.5-1 8-4 8-8V6l-8-4Z"/><path d="m9 12 2 2 4-4"/></svg></div>
       <h1>Gestion des permanences</h1>
       <div class="tl">Permanences · Astreintes · Missions</div>
     </div>
@@ -217,15 +250,12 @@ details.cfg summary::-webkit-details-marker{display:none}
       <div style="height:16px"></div>
       <button class="btn dark" onclick="doLogin()">Se connecter</button>
       <div class="msg" id="liMsg"></div>
-      <div class="sec-line">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="10" width="16" height="11" rx="1"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
-        Comptes individuels — mot de passe chiffré et vérifié
-      </div>
-      <details class="cfg" id="cfgBox">
-        <summary>Configuration de la base de données</summary>
+      <button class="btn sec" style="margin-top:8px" onclick="openForgot()">Mot de passe oublié ?</button>
+      <div class="sec-line"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="10" width="16" height="11" rx="1"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Comptes individuels — mot de passe chiffré et vérifié</div>
+      <details class="cfg"><summary>Configuration de la base de données</summary>
         <label>URL Supabase</label><input id="liUrl" class="fld" placeholder="https://xxxx.supabase.co">
-        <label>Clé publique (anon)</label><input id="liKey" class="fld" placeholder="eyJhbGci…">
-        <div class="note">À renseigner une seule fois (ou intégrée à l'app avant compilation). Sans base configurée, l'application fonctionne en local sur cet appareil uniquement.</div>
+        <label>Clé publique</label><input id="liKey" class="fld" placeholder="clé anon / publishable">
+        <div class="note">Déjà intégrée à l'app. Le 1er compte créé devient administrateur.</div>
       </details>
     </div>
     <div class="foot">Données chiffrées en transit (HTTPS) · stockage Supabase · fonctionne hors-ligne</div>
@@ -236,52 +266,37 @@ details.cfg summary::-webkit-details-marker{display:none}
 <div id="app" class="hidden">
   <header class="app">
     <div class="row">
-      <div class="mono-mark">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#cdb47a" stroke-width="1.6"><path d="M12 2 4 6v6c0 4 3.5 7 8 8 4.5-1 8-4 8-8V6l-8-4Z"/></svg>
-      </div>
-      <div>
-        <div class="h-t">Permanences</div>
-        <div class="h-s" id="hdrSub">Service</div>
-      </div>
+      <div class="mono-mark"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#cdb47a" stroke-width="1.6"><path d="M12 2 4 6v6c0 4 3.5 7 8 8 4.5-1 8-4 8-8V6l-8-4Z"/></svg></div>
+      <div><div class="h-t">Permanences</div><div class="h-s" id="hdrSub">Service</div></div>
       <div class="h-right">
+        <button class="bell" onclick="openNotifs()"><svg viewBox="0 0 24 24"><path d="M6 9a6 6 0 0 1 12 0c0 6 2 7 2 7H4s2-1 2-7Z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg><span class="nbadge hidden" id="nBadge">0</span></button>
         <div class="sync off" id="syncBox"><span class="d"></span><span id="syncTxt">local</span></div>
-        <div class="h-user"><b id="hdrUser">—</b>connecté</div>
+        <div class="h-user"><b id="hdrUser">—</b><span class="rl" id="hdrRole"></span></div>
         <button class="logout" onclick="logout()">Quitter</button>
       </div>
     </div>
   </header>
-
   <main>
     <section id="view-planning" class="screen"></section>
     <section id="view-missions" class="screen hidden"></section>
     <section id="view-effectifs" class="screen hidden"></section>
     <section id="view-params" class="screen hidden"></section>
   </main>
-
   <nav class="tabs">
-    <button class="tab on" data-tab="planning" onclick="go('planning')">
-      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="1"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>Planning</button>
-    <button class="tab" data-tab="missions" onclick="go('missions')">
-      <svg viewBox="0 0 24 24"><path d="M3 7a1 1 0 0 1 1-1h5l2 2h8a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7Z"/></svg>Missions</button>
-    <button class="tab" data-tab="effectifs" onclick="go('effectifs')">
-      <svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M4 20a5 5 0 0 1 10 0M16 6a3 3 0 0 1 0 6M20 20a5 5 0 0 0-4-4.9"/></svg>Effectifs</button>
-    <button class="tab" data-tab="params" onclick="go('params')">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1.2l2-1.6-2-3.4-2.4 1a7 7 0 0 0-2-1.2l-.4-2.6H9.9l-.4 2.6a7 7 0 0 0-2 1.2l-2.4-1-2 3.4 2 1.6A7 7 0 0 0 5 12c0 .4 0 .8.1 1.2l-2 1.6 2 3.4 2.4-1a7 7 0 0 0 2 1.2l.4 2.6h4.2l.4-2.6a7 7 0 0 0 2-1.2l2.4 1 2-3.4-2-1.6c.1-.4.1-.8.1-1.2Z"/></svg>Réglages</button>
+    <button class="tab on" data-tab="planning" onclick="go('planning')"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="1"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>Planning</button>
+    <button class="tab" data-tab="missions" onclick="go('missions')"><svg viewBox="0 0 24 24"><path d="M3 7a1 1 0 0 1 1-1h5l2 2h8a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7Z"/></svg>Missions</button>
+    <button class="tab" data-tab="effectifs" onclick="go('effectifs')"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M4 20a5 5 0 0 1 10 0M16 6a3 3 0 0 1 0 6M20 20a5 5 0 0 0-4-4.9"/></svg>Effectifs</button>
+    <button class="tab" data-tab="params" onclick="go('params')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1.2l2-1.6-2-3.4-2.4 1a7 7 0 0 0-2-1.2l-.4-2.6H9.9l-.4 2.6a7 7 0 0 0-2 1.2l-2.4-1-2 3.4 2 1.6A7 7 0 0 0 5 12c0 .4 0 .8.1 1.2l-2 1.6 2 3.4 2.4-1a7 7 0 0 0 2 1.2l.4 2.6h4.2l.4-2.6a7 7 0 0 0 2-1.2l2.4 1 2-3.4-2-1.6c.1-.4.1-.8.1-1.2Z"/></svg>Réglages</button>
   </nav>
 </div>
-
 <div id="modalRoot"></div>
 
 <script>
-/* ============================================================
-   CONFIGURATION BASE DE DONNÉES
-   Pour intégrer définitivement la base à l'app (avant compilation
-   de l'APK), renseignez les deux valeurs ci-dessous.
-   ============================================================ */
+/* ===== CONFIGURATION BASE DE DONNÉES ===== */
 const SUPABASE_URL = "https://iuzyerrmblumrmhenivn.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_x-FQXc7K-EUG8EWBa3pGlA_ZHY-ODF8";
 
-/* ===== Stockage local (cache hors-ligne) ===== */
+/* ===== Stockage local ===== */
 const Store = (() => {
   let ok=false; try{ localStorage.setItem("__t","1"); localStorage.removeItem("__t"); ok=true; }catch(e){}
   const mem={};
@@ -308,22 +323,28 @@ function defaultDB(){ return {
   serviceName:"Service",
   colors:Object.fromEntries(Object.entries(TYPES).map(([k,v])=>[k,v.color])),
   slots:{permanence:{debut:"08:00",fin:"18:00",nb:1},astreinte:{debut:"18:00",fin:"08:00",nb:1}},
-  agents:[],events:[],missionTypes:[...DEFAULT_MISSION_TYPES],missions:[],lastEditBy:"" }; }
+  agents:[],events:[],missionTypes:[...DEFAULT_MISSION_TYPES],missions:[],activity:[],lastEditBy:"" }; }
 let DB=defaultDB();
 
-let tab="planning",planMode="mois",cursor=new Date(),missionFilter={type:"",agent:"",q:""};
+let tab="planning",planMode="mois",cursor=new Date();
+let missionFilter={date:"",type:"",agent:"",q:""};
 
 /* ===== Session & base ===== */
-let session={pseudo:"",password:""}, sb=null, lastSync=0, pollTimer=null, pushTimer=null, applying=false;
+let session={pseudo:"",password:"",role:"user"}, sb=null, lastSync=0, pollTimer=null, pushTimer=null, applying=false;
+const isAdmin=()=>session.role==="admin";
 function getCfg(){ let url=SUPABASE_URL,key=SUPABASE_ANON_KEY; const o=Store.get("permCfg");
   if(o){ try{ const c=JSON.parse(o); url=c.url||url; key=c.key||key; }catch(e){} } return {url,key}; }
 function cloudReady(){ const c=getCfg(); return !!(c.url&&c.key&&typeof supabase!=="undefined"&&supabase.createClient); }
-function makeClient(){ const c=getCfg(); sb = cloudReady()?supabase.createClient(c.url,c.key):null; return sb; }
+function makeClient(){ if(sb) return sb; const c=getCfg(); sb = cloudReady()?supabase.createClient(c.url,c.key,{auth:{persistSession:false}}):null; return sb; }
 function cacheKey(){ return "permApp:shared"; }
 function saveLocal(){ Store.set(cacheKey(),JSON.stringify({data:DB,ts:lastSync})); }
 function loadLocal(){ const r=Store.get(cacheKey()); if(r){ try{ const o=JSON.parse(r); DB=Object.assign(defaultDB(),o.data); lastSync=o.ts||0; return true; }catch(e){} } return false; }
-
 function syncState(cls,txt){ const b=document.getElementById("syncBox"); if(!b)return; b.className="sync "+cls; document.getElementById("syncTxt").textContent=txt; }
+
+/* ===== Thème ===== */
+function applyTheme(){ const d=Store.get("permTheme")==="dark"; document.body.classList.toggle("dark",d);
+  document.querySelector('meta[name=theme-color]').setAttribute("content", d?"#0b1016":"#1b2533"); }
+function toggleTheme(){ Store.set("permTheme", Store.get("permTheme")==="dark"?"light":"dark"); applyTheme(); if(tab==="params") renderParams(); }
 
 /* ===== Dates ===== */
 const MOIS=["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
@@ -348,9 +369,9 @@ const colorOf=t=>DB.colors[t]||"#888";
 const eventsOn=ds=>DB.events.filter(e=>e.date===ds);
 const missionsOn=ds=>DB.missions.filter(m=>m.date===ds);
 
-/* ===== Authentification (compte : pseudo + mot de passe) ===== */
+/* ===== Connexion ===== */
 function loginMsg(t,err){ const e=$("#liMsg"); if(e){ e.textContent=t||""; e.className="msg"+(err?" err":""); } }
-const isAuthErr=e=>{ const m=(e&&(e.message||e.hint||""))+(e&&e.code||""); return /AUTH|28000/.test(m); };
+const isAuthErr=e=>{ const m=((e&&(e.message||e.hint))||"")+((e&&e.code)||""); return /AUTH|28000/.test(m); };
 
 async function doLogin(){
   const pseudo=$("#liPseudo").value.trim(), pwd=$("#liPwd").value;
@@ -358,52 +379,56 @@ async function doLogin(){
   const cu=$("#liUrl"), ck=$("#liKey");
   if(cu&&(cu.value.trim()||ck.value.trim())) Store.set("permCfg",JSON.stringify({url:cu.value.trim(),key:ck.value.trim()}));
   if(!cloudReady()){ loginMsg("Base de données injoignable (réseau ou configuration).",true); return; }
-  makeClient(); session={pseudo,password:pwd}; loginMsg("Connexion…");
+  makeClient(); loginMsg("Connexion…"); let recoveryToShow=null;
   try{
-    const {data:status,error}=await sb.rpc("auth_check",{p_pseudo:pseudo,p_password:pwd});
+    const {data,error}=await sb.rpc("auth_login",{p_pseudo:pseudo,p_password:pwd});
     if(error) throw error;
-    if(status==="wrong"){ loginMsg("Mot de passe incorrect",true); session={pseudo:"",password:""}; return; }
-    if(status==="new"){
-      if(!confirm("Aucun compte « "+pseudo+" ». Créer ce compte avec ce mot de passe ?")){ loginMsg(""); session={pseudo:"",password:""}; return; }
-      if(pwd.length<4){ loginMsg("Mot de passe trop court (4 caractères min.)",true); session={pseudo:"",password:""}; return; }
-      const {error:er}=await sb.rpc("auth_register",{p_pseudo:pseudo,p_password:pwd});
-      if(er) throw er;
+    if(data.status==="wrong"){ loginMsg("Mot de passe incorrect",true); return; }
+    let role=data.role;
+    if(data.status==="new"){
+      if(!confirm("Aucun compte « "+pseudo+" ». Créer ce compte ?")){ loginMsg(""); return; }
+      if(pwd.length<4){ loginMsg("Mot de passe trop court (4 caractères min.)",true); return; }
+      const {data:r,error:er}=await sb.rpc("auth_register",{p_pseudo:pseudo,p_password:pwd});
+      if(er) throw er; role=r.role; recoveryToShow=r.recovery;
     }
-    // status ok (ou compte fraîchement créé) -> charger le planning partagé
-    const {data,error:e2}=await sb.rpc("service_pull",{p_pseudo:pseudo,p_password:pwd});
+    session={pseudo,password:pwd,role:role||"user"};
+    const {data:pdata,error:e2}=await sb.rpc("service_pull",{p_pseudo:pseudo,p_password:pwd});
     if(e2) throw e2;
-    DB=Object.assign(defaultDB(), data||{}); lastSync=Date.now(); saveLocal(); enterApp();
-  }catch(e){
-    loginMsg("Connexion impossible (réseau ou base).",true); session={pseudo:"",password:""};
-  }
+    DB=Object.assign(defaultDB(), pdata||{}); lastSync=Date.now(); saveLocal(); enterApp();
+    if(recoveryToShow) showRecovery(recoveryToShow);
+  }catch(e){ loginMsg("Connexion impossible (réseau ou base).",true); }
 }
 function enterApp(){
   Store.set("permSession",JSON.stringify(session));
   $("#login").classList.add("hidden"); $("#app").classList.remove("hidden");
   $("#hdrSub").textContent=DB.serviceName||"Service";
   $("#hdrUser").textContent=session.pseudo;
+  $("#hdrRole").textContent=isAdmin()?"Administrateur":"Utilisateur";
+  document.querySelector('[data-tab="effectifs"]').style.display=isAdmin()?"":"none";
   if(sb){ syncState("ok","synchronisé"); startPoll(); } else { syncState("off","local"); }
-  $("#liPwd").value=""; go("planning");
+  $("#liPwd").value=""; updateBadge(); go("planning");
 }
 function logout(){
   if(pollTimer) clearInterval(pollTimer); pollTimer=null; sb=null;
-  Store.del("permSession"); session={pseudo:"",password:""}; DB=defaultDB();
+  Store.del("permSession"); session={pseudo:"",password:"",role:"user"}; DB=defaultDB();
   $("#app").classList.add("hidden"); $("#login").classList.remove("hidden");
   $("#liPseudo").value=""; $("#liPwd").value=""; loginMsg("");
 }
 async function relogin(){
-  const s=Store.get("permSession"); if(!s){ return false; }
-  try{ session=JSON.parse(s); }catch(e){ return false; }
-  if(!session.pseudo){ return false; }
+  const s=Store.get("permSession"); if(!s) return false;
+  try{ session=JSON.parse(s); if(!session.role) session.role="user"; }catch(e){ return false; }
+  if(!session.pseudo) return false;
   if(cloudReady()){
     makeClient();
     try{
+      const {data:l}=await sb.rpc("auth_login",{p_pseudo:session.pseudo,p_password:session.password});
+      if(l&&l.status==="ok"&&l.role) session.role=l.role;
       const {data,error}=await sb.rpc("service_pull",{p_pseudo:session.pseudo,p_password:session.password});
       if(error) throw error;
       DB=Object.assign(defaultDB(), data||{}); lastSync=Date.now(); saveLocal(); enterApp(); return true;
     }catch(e){
-      if(isAuthErr(e)){ logout(); return false; }          // identifiants invalides -> reconnexion
-      if(loadLocal()){ sb=null; enterApp(); toast("Hors-ligne — données locales"); return true; } // réseau
+      if(isAuthErr(e)){ logout(); return false; }
+      if(loadLocal()){ sb=null; enterApp(); toast("Hors-ligne — données locales"); return true; }
     }
   }
   return false;
@@ -422,15 +447,35 @@ async function poll(){
     if(error) throw error;
     if(data){ const t=new Date(data).getTime();
       if(t>lastSync+500){ const r=await sb.rpc("service_pull",{p_pseudo:session.pseudo,p_password:session.password});
-        if(!r.error&&r.data){ applying=true; DB=Object.assign(defaultDB(),r.data); lastSync=t; saveLocal(); applying=false; rerender(); syncState("ok","mis à jour"); } } }
+        if(!r.error&&r.data){ applying=true; DB=Object.assign(defaultDB(),r.data); lastSync=t; saveLocal(); applying=false; rerender(); updateBadge(); syncState("ok","mis à jour"); } } }
   }catch(e){ syncState("off","hors-ligne"); }
 }
 function rerender(){ ({planning:renderPlanning,missions:renderMissions,effectifs:renderEffectifs,params:renderParams}[tab]||(()=>{}))(); }
 function save(){ DB.lastEditBy=session.pseudo; saveLocal(); schedulePush(); }
 window.addEventListener("online",()=>{ if(sb) pushNow(); });
 
+/* ===== Activité / Notifications ===== */
+function logActivity(text){ DB.activity=DB.activity||[]; DB.activity.unshift({ts:Date.now(),by:session.pseudo,text}); if(DB.activity.length>60) DB.activity.length=60; }
+function seenTs(){ return +(Store.get("permSeen:"+session.pseudo)||0); }
+function unreadCount(){ const s=seenTs(); return (DB.activity||[]).filter(a=>a.ts>s && a.by!==session.pseudo).length; }
+function updateBadge(){ const n=unreadCount(); const b=$("#nBadge"); if(!b)return; if(n>0){ b.textContent=n>9?"9+":n; b.classList.remove("hidden"); } else b.classList.add("hidden"); }
+function openNotifs(){
+  const list=(DB.activity||[]);
+  const s=seenTs();
+  const html = list.length ? list.map(a=>{
+    const read=a.ts<=s||a.by===session.pseudo;
+    const d=new Date(a.ts);
+    return `<div class="notif ${read?"read":""}"><span class="ndot"></span><div><div class="nt">${esc(a.text)}</div><div class="nm2">${esc(a.by)} · ${d.toLocaleDateString("fr-FR")} ${pad(d.getHours())}:${pad(d.getMinutes())}</div></div></div>`;
+  }).join("") : `<div class="empty" style="padding:26px">Aucune activité récente.</div>`;
+  showModal(`<h3>Notifications</h3><div class="msub">Nouvelles missions et modifications du planning.</div>${html}
+    <button class="btn sec" style="margin-top:14px;width:100%" onclick="closeModal()">Fermer</button>`);
+  Store.set("permSeen:"+session.pseudo, String(Date.now())); updateBadge();
+}
+
 /* ===== Navigation ===== */
-function go(t){ tab=t;
+function go(t){
+  if(t==="effectifs"&&!isAdmin()) t="planning";
+  tab=t;
   ["planning","missions","effectifs","params"].forEach(x=>{
     $("#view-"+x).classList.toggle("hidden",x!==t);
     document.querySelector(`[data-tab="${x}"]`).classList.toggle("on",x===t); });
@@ -444,7 +489,7 @@ function screenHead(title,sub,label,fn){
 /* ===== PLANNING ===== */
 function renderPlanning(){
   $("#view-planning").innerHTML=
-    screenHead("Planning",esc(DB.serviceName),"+ Événement",`openEventModal(null,'${ymd(cursor)}')`)+
+    screenHead("Planning",esc(DB.serviceName), isAdmin()?"+ Événement":"", `openEventModal(null,'${ymd(cursor)}')`)+
     `<div class="seg" id="planSeg">
       <button data-m="mois" class="${planMode==="mois"?"on":""}">Mois</button>
       <button data-m="semaine" class="${planMode==="semaine"?"on":""}">Semaine</button>
@@ -471,28 +516,28 @@ function renderMonth(){
     if(evs.length>3) pills+=`<div class="more">+${evs.length-3}</div>`;
     h+=`<div class="day ${inM?"":"out"} ${isWE(d)?"we":""} ${isToday(d)?"today":""}" onclick="openDay('${ds}')">
       <div class="num tnum">${d.getDate()}</div>${pills}${missionsOn(ds).length?`<span class="mdot"></span>`:""}</div>`; }
-  h+=`</div>`+legendCard()+`<div class="note">Touchez une journée pour la détailler · carré bleu = mission programmée.</div>`;
+  h+=`</div><div class="card" style="margin-top:13px;padding:12px"><div class="legend">`+
+    Object.entries(TYPES).map(([k,t])=>`<span><i style="background:${colorOf(k)}"></i>${esc(t.label)}</span>`).join("")+`</div></div>`+
+    `<div class="note">Touchez une journée pour la détailler · carré bleu = mission programmée.</div>`;
   $("#planBody").innerHTML=h;
 }
-function legendCard(){ return `<div class="card" style="margin-top:13px;padding:12px"><div class="legend">`+
-  Object.entries(TYPES).map(([k,t])=>`<span><i class="cdot" style="display:inline-block;background:${colorOf(k)}"></i>${esc(t.label)}</span>`).join("")+`</div></div>`; }
 function renderWeek(){ const s=startOfWeek(cursor),e=addDays(s,6);
   const lbl=`${s.getDate()} ${MOIS[s.getMonth()].slice(0,4)}. – ${e.getDate()} ${MOIS[e.getMonth()].slice(0,4)}. ${e.getFullYear()}`;
   let h=calBar(lbl,"semaine"); for(let i=0;i<7;i++) h+=dayBlock(addDays(s,i)); $("#planBody").innerHTML=h; }
-function renderDay(){ $("#planBody").innerHTML=calBar(`${fmtLong(cursor)} ${cursor.getFullYear()}`,"jour")+dayBlock(cursor,true); }
+function renderDay(){ $("#planBody").innerHTML=calBar(`${fmtLong(cursor)} ${cursor.getFullYear()}`,"jour")+dayBlock(cursor); }
 function dayBlock(d){
-  const ds=ymd(d),evs=eventsOn(ds),byType=t=>evs.filter(e=>e.type===t);
+  const ds=ymd(d),evs=eventsOn(ds),byType=t=>evs.filter(e=>e.type===t),adm=isAdmin();
   const tagsFor=arr=>arr.length?`<div class="tris">`+arr.flatMap(e=>e.agentIds.map(id=>
-      `<span class="tag ed" style="background:${colorOf(e.type)}" onclick="event.stopPropagation();openEventModal('${e.id}')">${esc(triOf(id))}</span>`)).join("")+`</div>`
+      `<span class="tag ${adm?"ed":""}" style="background:${colorOf(e.type)}" ${adm?`onclick="event.stopPropagation();openEventModal('${e.id}')"`:""}>${esc(triOf(id))}</span>`)).join("")+`</div>`
     :`<span class="nofill">— personne —</span>`;
   const perm=byType("permanence"),astr=byType("astreinte"),absEvs=evs.filter(e=>ABS_TYPES.includes(e.type)),miss=missionsOn(ds);
   const todayTag=isToday(d)?"<small>aujourd'hui</small>":"";
   let absBlk=""; if(absEvs.length){ absBlk=`<div class="slot"><div class="sh"><span class="cdot" style="background:${colorOf("absence")}"></span>Absences & statuts</div><div class="tris">`+
-    absEvs.flatMap(e=>e.agentIds.map(id=>`<span class="tag ed" style="background:${colorOf(e.type)}" onclick="event.stopPropagation();openEventModal('${e.id}')">${esc(triOf(id))} · ${esc(TYPES[e.type].short)}</span>`)).join("")+`</div></div>`; }
+    absEvs.flatMap(e=>e.agentIds.map(id=>`<span class="tag ${adm?"ed":""}" style="background:${colorOf(e.type)}" ${adm?`onclick="event.stopPropagation();openEventModal('${e.id}')"`:""}>${esc(triOf(id))} · ${esc(TYPES[e.type].short)}</span>`)).join("")+`</div></div>`; }
   let missBlk=""; if(miss.length){ missBlk=`<div class="slot"><div class="sh"><span class="cdot" style="background:var(--accent)"></span>Missions (${miss.length})</div>`+
     miss.map(x=>`<div class="mline" onclick="event.stopPropagation();openMissionModal('${x.id}')">• <b>${esc(x.type)}</b> ${x.debut?esc(x.debut):""}${x.lieu?" · "+esc(x.lieu):""}${x.agentIds.length?" · "+x.agentIds.map(triOf).join(","):""}</div>`).join("")+`</div>`; }
   return `<div class="dayblock"><div class="dh"><div class="dt">${fmtLong(d)}${todayTag}</div>
-    <button class="btn sec sm" onclick="openEventModal(null,'${ds}')">+ Événement</button></div>
+    ${adm?`<button class="btn sec sm" onclick="openEventModal(null,'${ds}')">+ Événement</button>`:""}</div>
     <div class="slot"><div class="sh"><span class="cdot" style="background:${colorOf("permanence")}"></span>Permanence<span class="time tnum">${esc(DB.slots.permanence.debut)}–${esc(DB.slots.permanence.fin)}</span></div>${tagsFor(perm)}</div>
     <div class="slot"><div class="sh"><span class="cdot" style="background:${colorOf("astreinte")}"></span>Astreinte<span class="time tnum">${esc(DB.slots.astreinte.debut)}–${esc(DB.slots.astreinte.fin)}</span></div>${tagsFor(astr)}</div>
     ${absBlk}${missBlk}</div>`;
@@ -500,6 +545,7 @@ function dayBlock(d){
 function openDay(ds){ cursor=parseYmd(ds); planMode="jour"; renderPlanning(); }
 
 function openEventModal(id,presetDate){
+  if(!isAdmin()) return;
   const ev=id?DB.events.find(e=>e.id===id):null, date=ev?.date||presetDate||ymd(cursor), sel=new Set(ev?.agentIds||[]);
   const typeOpts=Object.entries(TYPES).map(([k,v])=>`<option value="${k}" ${ev?.type===k?"selected":""}>${v.label}</option>`).join("");
   const chips=DB.agents.length?DB.agents.map(a=>`<span class="chip ${sel.has(a.id)?"on":""}" data-id="${a.id}">${esc(a.trigramme)} · ${esc(a.nom)}</span>`).join(""):`<span class="nofill">Aucun agent — ajoutez d'abord des effectifs.</span>`;
@@ -516,8 +562,9 @@ function openEventModal(id,presetDate){
 function saveEvent(id){ const type=$("#evType").value,date=$("#evDate").value,agentIds=[...$("#evAgents").querySelectorAll(".chip.on")].map(c=>c.dataset.id);
   if(!agentIds.length){ toast("Sélectionnez au moins un agent"); return; }
   if(id) Object.assign(DB.events.find(e=>e.id===id),{type,date,agentIds}); else DB.events.push({id:uid(),type,date,agentIds});
+  logActivity(`Planning modifié : ${TYPES[type].label} le ${date}`);
   save(); closeModal(); renderPlanning(); toast("Événement enregistré"); }
-function delEvent(id){ DB.events=DB.events.filter(e=>e.id!==id); save(); closeModal(); renderPlanning(); toast("Supprimé"); }
+function delEvent(id){ DB.events=DB.events.filter(e=>e.id!==id); logActivity("Planning modifié (suppression)"); save(); closeModal(); renderPlanning(); toast("Supprimé"); }
 
 /* ===== MISSIONS ===== */
 function renderMissions(){
@@ -525,20 +572,25 @@ function renderMissions(){
   const agents=DB.agents.map(a=>`<option value="${a.id}">${esc(a.trigramme)}</option>`).join("");
   $("#view-missions").innerHTML=screenHead("Missions",`${DB.missions.length} enregistrée(s)`,"+ Mission","openMissionModal()")+
     `<div class="card" style="padding:13px">
-      <div class="grid2"><div><label>Type</label><select id="fType" class="fld"><option value="">Tous</option>${types}</select></div>
-      <div><label>Agent</label><select id="fAgent" class="fld"><option value="">Tous</option>${agents}</select></div></div>
-      <label>Recherche (lieu, OPJ, commentaire)</label><input id="fQ" class="fld" placeholder="Rechercher…" value="${esc(missionFilter.q)}">
-      <div class="btn-row"><button class="btn sec sm" onclick="exportMissionsCSV()">Export Excel (CSV)</button>
-      <button class="btn sec sm" onclick="openMissionTypes()">Types de missions</button></div></div>
+      <div class="grid2"><div><label>Date</label><input id="fDate" type="date" class="fld" value="${esc(missionFilter.date)}"></div>
+      <div><label>Type</label><select id="fType" class="fld"><option value="">Tous</option>${types}</select></div></div>
+      <div class="grid2"><div><label>Agent</label><select id="fAgent" class="fld"><option value="">Tous</option>${agents}</select></div>
+      <div><label>Lieu / OPJ</label><input id="fQ" class="fld" placeholder="Rechercher…" value="${esc(missionFilter.q)}"></div></div>
+      <div class="btn-row"><button class="btn sec sm" onclick="clearFilters()">Réinitialiser</button>
+      <button class="btn sec sm" onclick="exportMissionsCSV()">Export Excel</button>
+      ${isAdmin()?`<button class="btn sec sm" onclick="openMissionTypes()">Types</button>`:""}</div></div>
     <div id="missList"></div>`;
   $("#fType").value=missionFilter.type; $("#fAgent").value=missionFilter.agent;
+  $("#fDate").onchange=e=>{missionFilter.date=e.target.value;drawMissions();};
   $("#fType").onchange=e=>{missionFilter.type=e.target.value;drawMissions();};
   $("#fAgent").onchange=e=>{missionFilter.agent=e.target.value;drawMissions();};
   $("#fQ").oninput=e=>{missionFilter.q=e.target.value;drawMissions();};
   drawMissions();
 }
+function clearFilters(){ missionFilter={date:"",type:"",agent:"",q:""}; renderMissions(); }
 function drawMissions(){ const q=missionFilter.q.toLowerCase();
-  const list=DB.missions.filter(m=>!missionFilter.type||m.type===missionFilter.type)
+  const list=DB.missions.filter(m=>!missionFilter.date||m.date===missionFilter.date)
+    .filter(m=>!missionFilter.type||m.type===missionFilter.type)
     .filter(m=>!missionFilter.agent||m.agentIds.includes(missionFilter.agent))
     .filter(m=>!q||(m.lieu||"").toLowerCase().includes(q)||(m.opj||"").toLowerCase().includes(q)||(m.comment||"").toLowerCase().includes(q))
     .sort((a,b)=>(b.date+(b.debut||"")).localeCompare(a.date+(a.debut||"")));
@@ -548,34 +600,38 @@ function drawMissions(){ const q=missionFilter.q.toLowerCase();
     <div class="meta"><div class="nm">${esc(m.type)}${m.agentIds.length?` · <span style="color:var(--ink-2);font-weight:500">${m.agentIds.map(triOf).join(", ")}</span>`:""}</div>
     <div class="det tnum">${fmtLong(parseYmd(m.date))}${m.debut?" · "+esc(m.debut):""}${m.fin?"–"+esc(m.fin):""}${m.lieu?" · "+esc(m.lieu):""}${m.opj?" · OPJ "+esc(m.opj):""}</div></div>
     <span class="chev">›</span></div>`).join("")
-    :`<div class="empty"><svg class="ic" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 7a1 1 0 0 1 1-1h5l2 2h8a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7Z"/></svg>Aucune mission${missionFilter.type||missionFilter.agent||q?" ne correspond":""}.<div class="sm">Bouton « + Mission » pour en créer une.</div></div>`;
+    :`<div class="empty"><svg class="ic" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 7a1 1 0 0 1 1-1h5l2 2h8a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7Z"/></svg>Aucune mission ne correspond.<div class="sm">Bouton « + Mission » pour en créer une.</div></div>`;
 }
 function openMissionModal(id){
   const m=id?DB.missions.find(x=>x.id===id):null, sel=new Set(m?.agentIds||[]);
+  const ro = !!id && !isAdmin();   // utilisateur : consultation seule des missions existantes
   const typeOpts=DB.missionTypes.map(t=>`<option ${m?.type===t?"selected":""}>${esc(t)}</option>`).join("");
-  const chips=DB.agents.length?DB.agents.map(a=>`<span class="chip ${sel.has(a.id)?"on":""}" data-id="${a.id}">${esc(a.trigramme)}</span>`).join(""):`<span class="nofill">Aucun agent enregistré.</span>`;
-  showModal(`<h3>${id?"Mission":"Nouvelle mission"}</h3>
-    <label>Type de mission *</label><select id="mType" class="fld">${typeOpts}</select>
-    <div class="grid2"><div><label>Date *</label><input id="mDate" type="date" class="fld" value="${m?.date||ymd(new Date())}"></div>
-    <div><label>Lieu</label><input id="mLieu" class="fld" value="${esc(m?.lieu||"")}" placeholder="Commune / adresse"></div></div>
-    <div class="grid2"><div><label>Heure début *</label><input id="mDebut" type="time" class="fld" value="${m?.debut||""}"></div>
-    <div><label>Heure fin</label><input id="mFin" type="time" class="fld" value="${m?.fin||""}"></div></div>
-    <label>OPJ demandeur</label><input id="mOpj" class="fld" value="${esc(m?.opj||"")}" placeholder="Nom de l'OPJ">
-    <label>Commentaires</label><textarea id="mComment" class="fld" placeholder="Précisions…">${esc(m?.comment||"")}</textarea>
+  const chips=DB.agents.length?DB.agents.map(a=>`<span class="chip ${sel.has(a.id)?"on":""}" data-id="${a.id}" ${ro?'style="pointer-events:none;opacity:.7"':""}>${esc(a.trigramme)}</span>`).join(""):`<span class="nofill">Aucun agent enregistré.</span>`;
+  const dis=ro?"disabled":"";
+  showModal(`<h3>${id?(ro?"Mission (consultation)":"Mission"):"Nouvelle mission"}</h3>
+    <label>Type de mission *</label><select id="mType" class="fld" ${dis}>${typeOpts}</select>
+    <div class="grid2"><div><label>Date *</label><input id="mDate" type="date" class="fld" value="${m?.date||ymd(new Date())}" ${dis}></div>
+    <div><label>Lieu</label><input id="mLieu" class="fld" value="${esc(m?.lieu||"")}" placeholder="Commune / adresse" ${dis}></div></div>
+    <div class="grid2"><div><label>Heure début *</label><input id="mDebut" type="time" class="fld" value="${m?.debut||""}" ${dis}></div>
+    <div><label>Heure fin</label><input id="mFin" type="time" class="fld" value="${m?.fin||""}" ${dis}></div></div>
+    <label>OPJ demandeur</label><input id="mOpj" class="fld" value="${esc(m?.opj||"")}" placeholder="Nom de l'OPJ" ${dis}>
+    <label>Commentaires</label><textarea id="mComment" class="fld" placeholder="Précisions…" ${dis}>${esc(m?.comment||"")}</textarea>
     <label>Affectation</label><div class="agpick" id="mAgents">${chips}</div>
-    <div class="btn-row"><button class="btn" onclick="saveMission('${id||""}')">Enregistrer</button>
-    ${id?`<button class="btn danger sm" onclick="delMission('${id}')">Supprimer</button>`:""}</div>
-    <button class="btn sec" style="margin-top:9px;width:100%" onclick="closeModal()">Fermer</button>`);
-  bindChips("#mAgents");
+    ${ro?`<button class="btn sec" style="margin-top:15px;width:100%" onclick="closeModal()">Fermer</button>`
+        :`<div class="btn-row"><button class="btn" onclick="saveMission('${id||""}')">Enregistrer</button>
+          ${id?`<button class="btn danger sm" onclick="delMission('${id}')">Supprimer</button>`:""}</div>
+          <button class="btn sec" style="margin-top:9px;width:100%" onclick="closeModal()">Fermer</button>`}`);
+  if(!ro) bindChips("#mAgents");
 }
 function saveMission(id){ const o={type:$("#mType").value,date:$("#mDate").value,debut:$("#mDebut").value,fin:$("#mFin").value,
   lieu:$("#mLieu").value.trim(),opj:$("#mOpj").value.trim(),comment:$("#mComment").value.trim(),
   agentIds:[...$("#mAgents").querySelectorAll(".chip.on")].map(c=>c.dataset.id)};
   if(!o.date||!o.debut){ toast("Date et heure de début obligatoires"); return; }
-  if(id) Object.assign(DB.missions.find(x=>x.id===id),o); else DB.missions.push(Object.assign({id:uid()},o));
+  if(id){ Object.assign(DB.missions.find(x=>x.id===id),o); logActivity(`Mission modifiée : ${o.type} le ${o.date}`); }
+  else { DB.missions.push(Object.assign({id:uid()},o)); logActivity(`Nouvelle mission : ${o.type} le ${o.date}${o.agentIds.length?" ("+o.agentIds.map(triOf).join(",")+")":""}`); }
   save(); closeModal(); renderMissions(); toast("Mission enregistrée"); }
-function delMission(id){ DB.missions=DB.missions.filter(m=>m.id!==id); save(); closeModal(); renderMissions(); toast("Mission supprimée"); }
-function openMissionTypes(){ showModal(`<h3>Catalogue des types</h3><div class="msub">Créer, renommer ou supprimer.</div>
+function delMission(id){ DB.missions=DB.missions.filter(m=>m.id!==id); logActivity("Mission supprimée"); save(); closeModal(); renderMissions(); toast("Mission supprimée"); }
+function openMissionTypes(){ if(!isAdmin())return; showModal(`<h3>Catalogue des types</h3><div class="msub">Créer, renommer ou supprimer.</div>
   <div id="mtList"></div><label>Ajouter</label>
   <div style="display:flex;gap:8px"><input id="mtNew" class="fld" placeholder="Ex : Levée de corps"><button class="btn sm" onclick="addMt()">Ajouter</button></div>
   <button class="btn sec" style="margin-top:14px;width:100%" onclick="closeModal()">Fermer</button>`); drawMt(); }
@@ -586,8 +642,9 @@ function addMt(){ const v=$("#mtNew").value.trim(); if(!v)return; if(DB.missionT
 function renameMt(i){ const n=prompt("Nouveau nom :",DB.missionTypes[i]); if(n&&n.trim()){DB.missionTypes[i]=n.trim();save();drawMt();} }
 function delMt(i){ DB.missionTypes.splice(i,1); save(); drawMt(); }
 
-/* ===== EFFECTIFS ===== */
+/* ===== EFFECTIFS (admin) ===== */
 function renderEffectifs(){
+  if(!isAdmin()){ go("planning"); return; }
   const list=DB.agents.length?DB.agents.slice().sort((a,b)=>a.nom.localeCompare(b.nom)).map(a=>{
     const nm=DB.missions.filter(m=>m.agentIds.includes(a.id)).length, ne=DB.events.filter(e=>e.agentIds.includes(a.id)).length;
     return `<div class="item" onclick="openAgentModal('${a.id}')"><div class="badge" style="background:${triColor(a.trigramme)}">${esc(a.trigramme)}</div>
@@ -596,8 +653,8 @@ function renderEffectifs(){
     :`<div class="empty"><svg class="ic" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="9" cy="8" r="3"/><path d="M4 20a5 5 0 0 1 10 0M16 6a3 3 0 0 1 0 6"/></svg>Aucun agent enregistré.<div class="sm">Bouton « + Agent » pour en ajouter un.</div></div>`;
   $("#view-effectifs").innerHTML=screenHead("Effectifs",`${DB.agents.length} agent(s)`,"+ Agent","openAgentModal()")+list;
 }
-function triColor(s){ let h=0; for(const c of s) h=(h*31+c.charCodeAt(0))%360; return `hsl(${h} 32% 40%)`; }
-function openAgentModal(id){ const a=id?agentById(id):null;
+function triColor(s){ let h=0; for(const c of s) h=(h*31+c.charCodeAt(0))%360; return `hsl(${h} 32% 42%)`; }
+function openAgentModal(id){ if(!isAdmin())return; const a=id?agentById(id):null;
   showModal(`<h3>${id?"Modifier l'agent":"Nouvel agent"}</h3>
     <label>Nom *</label><input id="aNom" class="fld" value="${esc(a?.nom||"")}">
     <label>Prénom *</label><input id="aPrenom" class="fld" value="${esc(a?.prenom||"")}">
@@ -617,10 +674,30 @@ function delAgent(id){ if(!confirm("Supprimer cet agent du planning ?")) return;
 
 /* ===== RÉGLAGES ===== */
 function renderParams(){
+  const dark=Store.get("permTheme")==="dark";
+  const themeCard=`<div class="card"><h3>Apparence</h3>
+    <div class="switch"><div class="lab">Mode sombre</div><div class="tog ${dark?"on":""}" onclick="toggleTheme()"></div></div></div>`;
+  const accountCard=`<div class="card"><h3>Mon compte</h3>
+    <div class="note" style="margin:0 0 8px">Connecté en tant que <b>${esc(session.pseudo)}</b> — ${isAdmin()?"administrateur":"utilisateur"}.</div>
+    <button class="btn sec sm" onclick="openChangePwd()">Changer mon mot de passe</button>
+    <button class="btn sec sm" onclick="openRecovery()" style="margin-left:8px">Code de récupération</button></div>`;
+  const dataCard=`<div class="card"><h3>Données & partage</h3>
+    <div class="tablebar"><button class="btn sec sm" onclick="exportPlanningCSV()">Planning (CSV)</button>
+    <button class="btn sec sm" onclick="exportMissionsCSV()">Missions (CSV)</button>
+    <button class="btn sec sm" onclick="exportSnapshot()">Vue de consultation</button>
+    ${isAdmin()?`<button class="btn sec sm" onclick="exportJSON()">Sauvegarde</button><button class="btn sec sm" onclick="$('#impFile').click()">Restaurer</button>`:""}</div>
+    <input type="file" id="impFile" accept=".json" class="hidden" onchange="importJSON(this)">
+    <div class="note">« Vue de consultation » génère une page lecture seule partageable (Excel = CSV). Un lien public en direct nécessite un hébergement (voir note de livraison).</div></div>`;
+
+  if(!isAdmin()){
+    $("#view-params").innerHTML=screenHead("Réglages","Préférences")+themeCard+accountCard+dataCard;
+    return;
+  }
   const crows=Object.entries(TYPES).map(([k,t])=>`<div class="crow"><div class="sw" style="background:${colorOf(k)}">${esc(t.short)}</div>
     <div class="lab"><div class="nm">${t.label}</div><div class="hex">${colorOf(k)}</div></div>
     <input type="color" value="${colorOf(k)}" onchange="setColor('${k}',this.value)"></div>`).join("");
   $("#view-params").innerHTML=screenHead("Réglages","Configuration du service")+
+    themeCard+
     `<div class="card"><h3>Service</h3><label>Nom du service</label><input id="pName" class="fld" value="${esc(DB.serviceName)}">
       <button class="btn sm dark" style="margin-top:12px" onclick="saveService()">Enregistrer</button></div>
     <div class="card"><h3>Plages horaires & effectifs</h3>
@@ -630,21 +707,80 @@ function renderParams(){
       <label>Astreinte — nombre d'agents</label><input id="astrN" type="number" min="1" class="fld" value="${DB.slots.astreinte.nb}">
       <button class="btn sm dark" style="margin-top:12px" onclick="saveSlots()">Enregistrer</button></div>
     <div class="card"><h3>Couleurs des événements</h3>${crows}</div>
-    <div class="card"><h3>Données & connexion</h3>
-      <div class="tablebar"><button class="btn sec sm" onclick="exportPlanningCSV()">Planning (CSV)</button>
-      <button class="btn sec sm" onclick="exportMissionsCSV()">Missions (CSV)</button>
-      <button class="btn sec sm" onclick="exportJSON()">Sauvegarde</button>
-      <button class="btn sec sm" onclick="$('#impFile').click()">Restaurer</button></div>
-      <input type="file" id="impFile" accept=".json" class="hidden" onchange="importJSON(this)">
-      <div class="note">Compte : <b>${esc(session.pseudo||"—")}</b> · base : <b>${sb?"Supabase (sécurisée)":"hors-ligne (cache local)"}</b>.
-      ${DB.lastEditBy?`Dernière modification par <b>${esc(DB.lastEditBy)}</b>. `:""}Planning partagé entre tous les comptes.</div></div>`;
+    <div class="card"><h3>Comptes & rôles</h3>
+      <div class="note" style="margin:0 0 10px">Gérez les rôles et réinitialisez les mots de passe.</div>
+      <div id="usersList"><button class="btn sec sm" onclick="loadUsers()">Charger les comptes</button></div></div>`+
+    accountCard+dataCard+
+    `<div class="card"><h3>Évolutions</h3><div class="note">Notifications push (app fermée), lien public en direct, véhicules/matériel, réinitialisation par e-mail — voir note de livraison.</div></div>`;
 }
 function setColor(k,v){ DB.colors[k]=v; save(); renderParams(); }
 function saveService(){ DB.serviceName=$("#pName").value.trim()||"Service"; $("#hdrSub").textContent=DB.serviceName; save(); toast("Enregistré"); }
 function saveSlots(){ DB.slots.permanence={debut:$("#permD").value,fin:$("#permF").value,nb:+$("#permN").value||1};
   DB.slots.astreinte={debut:$("#astrD").value,fin:$("#astrF").value,nb:+$("#astrN").value||1}; save(); toast("Plages enregistrées"); }
 
-/* ===== EXPORTS ===== */
+/* ----- récupération de mot de passe (libre-service par code) ----- */
+function showRecovery(code){ showModal(`<h3>Votre code de récupération</h3>
+  <div class="msub">Il permet de réinitialiser votre mot de passe en cas d'oubli, sans administrateur.</div>
+  <div style="font-family:var(--mono);font-size:22px;font-weight:700;letter-spacing:3px;text-align:center;padding:16px;border:1px dashed var(--line-2);border-radius:var(--r);margin:6px 0;color:var(--ink)">${esc(code)}</div>
+  <div class="note">Notez-le hors de l'appareil (carnet, gestionnaire de mots de passe). Ce code remplace tout code précédent.</div>
+  <button class="btn" style="margin-top:12px" onclick="closeModal()">J'ai noté le code</button>`); }
+function openRecovery(){ showModal(`<h3>Code de récupération</h3>
+  <div class="msub">Générez un code à conserver pour réinitialiser votre mot de passe en cas d'oubli.</div>
+  <label>Mot de passe actuel</label><input id="rcPwd" type="password" class="fld">
+  <div class="btn-row"><button class="btn" onclick="genRecovery()">Générer un nouveau code</button></div>
+  <button class="btn sec" style="margin-top:9px;width:100%" onclick="closeModal()">Fermer</button>`); }
+async function genRecovery(){ const pw=$("#rcPwd").value; if(!sb){ toast("Connexion requise"); return; }
+  try{ const {data,error}=await sb.rpc("auth_generate_recovery",{p_pseudo:session.pseudo,p_password:pw}); if(error) throw error; showRecovery(data);
+  }catch(e){ toast("Mot de passe actuel incorrect"); } }
+function openForgot(){ showModal(`<h3>Réinitialiser le mot de passe</h3>
+  <div class="msub">Avec le code de récupération fourni à la création du compte.</div>
+  <label>Identifiant</label><input id="fgPseudo" class="fld" autocomplete="username">
+  <label>Code de récupération</label><input id="fgCode" class="fld" placeholder="ex : 682FE07DDB70">
+  <label>Nouveau mot de passe</label><input id="fgPwd" type="password" class="fld" placeholder="4 caractères min.">
+  <div class="btn-row"><button class="btn" onclick="doForgot()">Réinitialiser</button></div>
+  <button class="btn sec" style="margin-top:9px;width:100%" onclick="closeModal()">Annuler</button>`); }
+async function doForgot(){ const p=$("#fgPseudo").value.trim(),c=$("#fgCode").value.trim(),n=$("#fgPwd").value;
+  if(!p||!c||n.length<4){ toast("Champs requis (mot de passe 4 car. min.)"); return; }
+  if(!cloudReady()){ toast("Base injoignable"); return; } makeClient();
+  try{ const {data,error}=await sb.rpc("auth_reset_with_code",{p_pseudo:p,p_code:c,p_new:n}); if(error) throw error;
+    if(data==="ok"){ closeModal(); toast("Mot de passe réinitialisé — connectez-vous"); }
+    else if(data==="nocode"){ toast("Aucun code de récupération pour ce compte"); }
+    else toast("Code de récupération incorrect");
+  }catch(e){ toast("Échec (réseau ?)"); } }
+
+/* ----- compte : changer son mot de passe ----- */
+function openChangePwd(){ showModal(`<h3>Changer mon mot de passe</h3>
+  <label>Mot de passe actuel</label><input id="cpOld" type="password" class="fld">
+  <label>Nouveau mot de passe</label><input id="cpNew" type="password" class="fld" placeholder="4 caractères min.">
+  <div class="btn-row"><button class="btn" onclick="changePwd()">Valider</button></div>
+  <button class="btn sec" style="margin-top:9px;width:100%" onclick="closeModal()">Annuler</button>`); }
+async function changePwd(){ const o=$("#cpOld").value,n=$("#cpNew").value;
+  if(n.length<4){ toast("Nouveau mot de passe trop court"); return; }
+  if(!sb){ toast("Connexion requise"); return; }
+  try{ const {error}=await sb.rpc("auth_set_password",{p_pseudo:session.pseudo,p_old:o,p_new:n}); if(error) throw error;
+    session.password=n; Store.set("permSession",JSON.stringify(session)); closeModal(); toast("Mot de passe modifié");
+  }catch(e){ toast("Mot de passe actuel incorrect"); } }
+
+/* ----- admin : comptes & rôles ----- */
+async function loadUsers(){ if(!sb){ toast("Connexion requise"); return; }
+  const el=$("#usersList"); el.innerHTML="Chargement…";
+  try{ const {data,error}=await sb.rpc("admin_list_users",{p_admin:session.pseudo,p_password:session.password}); if(error) throw error;
+    el.innerHTML=(data||[]).map(u=>`<div class="item" style="padding:10px 12px"><div class="meta"><div class="nm">${esc(u.pseudo)}</div></div>
+      <span class="rolepill ${u.role}">${u.role==="admin"?"Admin":"Utilisateur"}</span>
+      <button class="btn sec sm" onclick="toggleRole('${esc(u.pseudo)}','${u.role}')">${u.role==="admin"?"↓ User":"↑ Admin"}</button>
+      <button class="btn sec sm" onclick="resetPwd('${esc(u.pseudo)}')">Réinit. MDP</button></div>`).join("")||"Aucun compte.";
+  }catch(e){ el.innerHTML=`<div class="note">Action réservée à l'administrateur.</div>`; } }
+async function toggleRole(pseudo,role){ const nr=role==="admin"?"user":"admin";
+  try{ const {error}=await sb.rpc("admin_set_role",{p_admin:session.pseudo,p_password:session.password,p_target:pseudo,p_role:nr}); if(error) throw error;
+    toast("Rôle mis à jour"); loadUsers();
+  }catch(e){ toast(/DERNIER_ADMIN/.test((e.message||"")+(e.code||""))?"Impossible : dernier administrateur":"Échec (droits ?)"); } }
+async function resetPwd(pseudo){ const np=prompt("Nouveau mot de passe pour « "+pseudo+" » (4 car. min.) :"); if(!np) return;
+  if(np.length<4){ toast("Trop court"); return; }
+  try{ const {error}=await sb.rpc("admin_reset_password",{p_admin:session.pseudo,p_password:session.password,p_target:pseudo,p_newpw:np}); if(error) throw error;
+    toast("Mot de passe réinitialisé");
+  }catch(e){ toast("Échec (droits ?)"); } }
+
+/* ===== EXPORTS / PARTAGE ===== */
 function dl(name,content,mime){ const b=new Blob(["\ufeff"+content],{type:mime}),u=URL.createObjectURL(b),a=document.createElement("a");
   a.href=u; a.download=name; a.click(); setTimeout(()=>URL.revokeObjectURL(u),1500); toast("Fichier généré"); }
 const cell=s=>`"${String(s??"").replace(/"/g,'""')}"`;
@@ -658,16 +794,34 @@ function exportJSON(){ dl("sauvegarde-permanences.json",JSON.stringify(DB,null,2
 function importJSON(input){ const f=input.files[0]; if(!f)return; const r=new FileReader();
   r.onload=()=>{ try{ DB=Object.assign(defaultDB(),JSON.parse(r.result)); save(); $("#hdrSub").textContent=DB.serviceName; toast("Restauré"); go(tab); }catch(e){ toast("Fichier invalide"); } }; r.readAsText(f); }
 
+function exportSnapshot(){
+  const today=new Date(), end=addDays(today,30);
+  const evs=DB.events.filter(e=>{const d=parseYmd(e.date);return d>=parseYmd(ymd(today))&&d<=end;}).sort((a,b)=>a.date.localeCompare(b.date));
+  const miss=DB.missions.filter(m=>{const d=parseYmd(m.date);return d>=parseYmd(ymd(today))&&d<=end;}).sort((a,b)=>(a.date+(a.debut||"")).localeCompare(b.date+(b.debut||"")));
+  const row=e=>`<tr><td>${esc(fmtLong(parseYmd(e.date)))}</td><td><span style="background:${colorOf(e.type)};color:#fff;padding:2px 7px;border-radius:3px;font-size:12px">${esc(TYPES[e.type].label)}</span></td><td>${esc(e.agentIds.map(triOf).join(", "))}</td></tr>`;
+  const mrow=m=>`<tr><td>${esc(fmtLong(parseYmd(m.date)))}${m.debut?" "+esc(m.debut):""}</td><td>${esc(m.type)}</td><td>${esc(m.lieu||"")}</td><td>${esc(m.opj||"")}</td><td>${esc(m.agentIds.map(triOf).join(", "))}</td></tr>`;
+  const html=`<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(DB.serviceName)} — Consultation</title>
+  <style>body{font-family:system-ui,Segoe UI,Arial,sans-serif;color:#1c2530;max-width:840px;margin:0 auto;padding:22px;background:#f4f5f7}
+  h1{font-size:20px}h2{font-size:15px;margin-top:26px;border-bottom:2px solid #2f5277;padding-bottom:6px}
+  table{width:100%;border-collapse:collapse;background:#fff;font-size:13px;margin-top:8px}
+  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid #e5e8ee}th{background:#1b2533;color:#fff;font-size:11px;text-transform:uppercase;letter-spacing:.04em}
+  .meta{color:#586170;font-size:12px}</style></head><body>
+  <h1>${esc(DB.serviceName)} — Planning de consultation</h1>
+  <div class="meta">Vue lecture seule · généré le ${new Date().toLocaleString("fr-FR")} · 30 jours à venir</div>
+  <h2>Permanences, astreintes & absences</h2><table><thead><tr><th>Date</th><th>Type</th><th>Agents</th></tr></thead><tbody>${evs.map(row).join("")||'<tr><td colspan=3 class=meta>Aucun événement.</td></tr>'}</tbody></table>
+  <h2>Missions</h2><table><thead><tr><th>Date</th><th>Type</th><th>Lieu</th><th>OPJ</th><th>Agents</th></tr></thead><tbody>${miss.map(mrow).join("")||'<tr><td colspan=5 class=meta>Aucune mission.</td></tr>'}</tbody></table>
+  </body></html>`;
+  dl("consultation-planning.html", html, "text/html");
+}
+
 /* ===== Modal ===== */
 function showModal(html){ $("#modalRoot").innerHTML=`<div class="overlay" onclick="if(event.target===this)closeModal()"><div class="modal"><div class="grab"></div>${html}</div></div>`; }
 function closeModal(){ $("#modalRoot").innerHTML=""; }
 function bindChips(sel){ document.querySelectorAll(sel+" .chip").forEach(c=>c.onclick=()=>c.classList.toggle("on")); }
 
 /* ===== Init ===== */
-(function init(){
-  if(!SUPABASE_URL && !Store.get("permCfg")){ /* config non intégrée : details reste ouvrable */ }
-  relogin();
-})();
+applyTheme();
+(function init(){ relogin(); })();
 if("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(()=>{});
 </script>
 </body>
