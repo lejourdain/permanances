@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Réinitialisation du mot de passe</title>
+<style>
+:root{--bg:#e9ebee;--surface:#fff;--ink:#1c2530;--ink2:#586170;--ink3:#8a929d;--line:#d3d8df;--line2:#c2c8d1;--slate:#1b2533;--accent:#2f5277;--danger:#b23b3b;--ok:#2f7d57}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:ui-sans-serif,system-ui,"Segoe UI",Roboto,Arial,sans-serif;font-size:14.5px;display:flex;min-height:100vh;align-items:center;justify-content:center;padding:24px}
+.card{width:100%;max-width:380px;background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:22px}
+.mark{width:52px;height:52px;border:1px solid var(--line2);border-radius:3px;display:grid;place-items:center;margin:0 auto 14px}
+h1{font-size:18px;font-weight:600;text-align:center;margin:0 0 4px}
+.sub{text-align:center;color:var(--ink2);font-size:12.5px;margin-bottom:16px}
+label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink2);font-weight:600;margin:12px 0 5px}
+.fld{width:100%;background:var(--surface);border:1px solid var(--line2);color:var(--ink);border-radius:3px;padding:10px 11px;font-size:14.5px}
+.fld:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 2px #e7edf3}
+.btn{width:100%;margin-top:16px;background:var(--slate);color:#fff;border:none;border-radius:3px;padding:11px;font-weight:600;font-size:14px;cursor:pointer}
+.btn:hover{background:#283549}
+.msg{font-size:12.5px;text-align:center;margin-top:12px;min-height:16px;color:var(--accent)}
+.msg.err{color:var(--danger)}.msg.ok{color:var(--ok)}
+a{color:var(--accent)}
+.foot{text-align:center;font-size:11px;color:var(--ink3);margin-top:16px}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="mark"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#2f5277" stroke-width="1.6"><rect x="4" y="10" width="16" height="11" rx="1"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div>
+  <h1>Nouveau mot de passe</h1>
+  <div class="sub" id="sub">Vérification du lien…</div>
+  <div id="form" style="display:none">
+    <label>Nouveau mot de passe</label>
+    <input id="p1" class="fld" type="password" placeholder="6 caractères minimum" autocomplete="new-password">
+    <label>Confirmer</label>
+    <input id="p2" class="fld" type="password" placeholder="Retapez le mot de passe" autocomplete="new-password">
+    <button class="btn" id="go">Mettre à jour</button>
+  </div>
+  <div class="msg" id="msg"></div>
+  <div class="foot">Cette page provient du lien reçu par e-mail.</div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL="https://iuzyerrmblumrmhenivn.supabase.co";
+const SUPABASE_ANON_KEY="sb_publishable_x-FQXc7K-EUG8EWBa3pGlA_ZHY-ODF8";
+const sub=document.getElementById("sub"),form=document.getElementById("form"),msg=document.getElementById("msg");
+function setMsg(t,c){ msg.textContent=t||""; msg.className="msg"+(c?(" "+c):""); }
+let sb=null, ready=false;
+try{ sb=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{auth:{persistSession:true,detectSessionInUrl:true,flowType:"implicit"}}); }catch(e){}
+if(!sb){ sub.textContent="Service indisponible."; }
+else{
+  sb.auth.onAuthStateChange((event,session)=>{
+    if(event==="PASSWORD_RECOVERY" || session){ ready=true; sub.textContent="Choisissez votre nouveau mot de passe."; form.style.display="block"; }
+  });
+  // Au cas où l'événement est déjà passé : vérifier la session après un court délai
+  setTimeout(async()=>{
+    if(ready) return;
+    try{ const {data:{session}}=await sb.auth.getSession();
+      if(session){ ready=true; sub.textContent="Choisissez votre nouveau mot de passe."; form.style.display="block"; }
+      else { sub.textContent="Lien invalide ou expiré."; setMsg("Demandez un nouveau lien depuis l'application.","err"); }
+    }catch(e){ sub.textContent="Lien invalide ou expiré."; }
+  },1500);
+}
+document.getElementById("go").onclick=async()=>{
+  const a=document.getElementById("p1").value,b=document.getElementById("p2").value;
+  if(a.length<6){ setMsg("6 caractères minimum.","err"); return; }
+  if(a!==b){ setMsg("Les deux mots de passe diffèrent.","err"); return; }
+  setMsg("Mise à jour…");
+  try{ const {error}=await sb.auth.updateUser({password:a}); if(error) throw error;
+    form.style.display="none"; sub.textContent="Mot de passe mis à jour."; setMsg("Vous pouvez revenir à l'application et vous connecter.","ok");
+  }catch(e){ setMsg("Échec : "+((e&&e.message)||"réessayez"),"err"); }
+};
+</script>
+</body>
+</html>
