@@ -336,6 +336,7 @@ let missionFilter={date:"",type:"",agent:"",q:""};
 let session={userId:"",email:"",pseudo:"",role:"user"}, sb=null, lastSync=0, pollTimer=null, pushTimer=null, applying=false;
 const isAdmin=()=>session.role==="admin";
 const RESET_REDIRECT="https://lejourdain.github.io/permanances/reset.html";
+const CONFIRM_REDIRECT="https://lejourdain.github.io/permanances/confirm.html";
 function getCfg(){ let url=SUPABASE_URL,key=SUPABASE_ANON_KEY; const o=Store.get("permCfg");
   if(o){ try{ const c=JSON.parse(o); url=c.url||url; key=c.key||key; }catch(e){} } return {url,key}; }
 function cloudReady(){ const c=getCfg(); return !!(c.url&&c.key&&typeof supabase!=="undefined"&&supabase.createClient); }
@@ -419,7 +420,7 @@ async function doSignup(){
   if(!cloudReady()){ loginMsg("Base injoignable (réseau ou configuration).",true); return; }
   makeClient(); loginMsg("Création du compte…");
   try{
-    const {data,error}=await sb.auth.signUp({email,password:pwd,options:{data:{pseudo},emailRedirectTo:RESET_REDIRECT}});
+    const {data,error}=await sb.auth.signUp({email,password:pwd,options:{data:{pseudo},emailRedirectTo:CONFIRM_REDIRECT}});
     if(error){ loginMsg(/registered/i.test(error.message)?"Un compte existe déjà avec cet e-mail":("Échec : "+error.message),true); return; }
     if(data.session){ await afterAuth(); }
     else { loginMsg("Compte créé. Vérifiez votre boîte mail pour confirmer, puis connectez-vous."); }
