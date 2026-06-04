@@ -283,12 +283,14 @@ details.cfg summary::-webkit-details-marker{display:none}
     <section id="view-planning" class="screen"></section>
     <section id="view-missions" class="screen hidden"></section>
     <section id="view-effectifs" class="screen hidden"></section>
+    <section id="view-ressources" class="screen hidden"></section>
     <section id="view-params" class="screen hidden"></section>
   </main>
   <nav class="tabs">
     <button class="tab on" data-tab="planning" onclick="go('planning')"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="1"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>Planning</button>
     <button class="tab" data-tab="missions" onclick="go('missions')"><svg viewBox="0 0 24 24"><path d="M3 7a1 1 0 0 1 1-1h5l2 2h8a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7Z"/></svg>Missions</button>
     <button class="tab" data-tab="effectifs" onclick="go('effectifs')"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M4 20a5 5 0 0 1 10 0M16 6a3 3 0 0 1 0 6M20 20a5 5 0 0 0-4-4.9"/></svg>Effectifs</button>
+    <button class="tab" data-tab="ressources" onclick="go('ressources')"><svg viewBox="0 0 24 24"><path d="M3 13l2-5a2 2 0 0 1 2-1.3h10A2 2 0 0 1 19 8l2 5"/><path d="M3 13h18v5a1 1 0 0 1-1 1h-2M3 13v5a1 1 0 0 0 1 1h2"/><circle cx="7" cy="19" r="1.6"/><circle cx="17" cy="19" r="1.6"/></svg>Ressources</button>
     <button class="tab" data-tab="params" onclick="go('params')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1.2l2-1.6-2-3.4-2.4 1a7 7 0 0 0-2-1.2l-.4-2.6H9.9l-.4 2.6a7 7 0 0 0-2 1.2l-2.4-1-2 3.4 2 1.6A7 7 0 0 0 5 12c0 .4 0 .8.1 1.2l-2 1.6 2 3.4 2.4-1a7 7 0 0 0 2 1.2l.4 2.6h4.2l.4-2.6a7 7 0 0 0 2-1.2l2.4 1 2-3.4-2-1.6c.1-.4.1-.8.1-1.2Z"/></svg>Réglages</button>
   </nav>
 </div>
@@ -326,7 +328,7 @@ function defaultDB(){ return {
   serviceName:"Service",
   colors:Object.fromEntries(Object.entries(TYPES).map(([k,v])=>[k,v.color])),
   slots:{permanence:{debut:"08:00",fin:"18:00",nb:1},astreinte:{debut:"18:00",fin:"08:00",nb:1}},
-  agents:[],events:[],missionTypes:[...DEFAULT_MISSION_TYPES],missions:[],activity:[],lastEditBy:"" }; }
+  agents:[],events:[],missionTypes:[...DEFAULT_MISSION_TYPES],missions:[],vehicles:[],materiel:[],activity:[],lastEditBy:"" }; }
 let DB=defaultDB();
 
 let tab="planning",planMode="mois",cursor=new Date();
@@ -477,7 +479,7 @@ async function poll(){
         if(!r.error&&r.data){ applying=true; DB=Object.assign(defaultDB(),r.data.data||{}); lastSync=t; saveLocal(); applying=false; rerender(); updateBadge(); syncState("ok","mis à jour"); } } }
   }catch(e){ syncState("off","hors-ligne"); }
 }
-function rerender(){ ({planning:renderPlanning,missions:renderMissions,effectifs:renderEffectifs,params:renderParams}[tab]||(()=>{}))(); }
+function rerender(){ ({planning:renderPlanning,missions:renderMissions,effectifs:renderEffectifs,ressources:renderRessources,params:renderParams}[tab]||(()=>{}))(); }
 function save(){ DB.lastEditBy=session.pseudo; saveLocal(); schedulePush(); }
 window.addEventListener("online",()=>{ if(sb) pushNow(); });
 
@@ -503,7 +505,7 @@ function openNotifs(){
 function go(t){
   if(t==="effectifs"&&!isAdmin()) t="planning";
   tab=t;
-  ["planning","missions","effectifs","params"].forEach(x=>{
+  ["planning","missions","effectifs","ressources","params"].forEach(x=>{
     $("#view-"+x).classList.toggle("hidden",x!==t);
     document.querySelector(`[data-tab="${x}"]`).classList.toggle("on",x===t); });
   rerender(); window.scrollTo(0,0);
@@ -558,6 +560,9 @@ function dayBlock(d){
       `<span class="tag ${adm?"ed":""}" style="background:${colorOf(e.type)}" ${adm?`onclick="event.stopPropagation();openEventModal('${e.id}')"`:""}>${esc(triOf(id))}</span>`)).join("")+`</div>`
     :`<span class="nofill">— personne —</span>`;
   const perm=byType("permanence"),astr=byType("astreinte"),absEvs=evs.filter(e=>ABS_TYPES.includes(e.type)),miss=missionsOn(ds);
+  const cntPerm=perm.reduce((n,e)=>n+e.agentIds.length,0), cntAstr=astr.reduce((n,e)=>n+e.agentIds.length,0);
+  const reqPerm=(DB.slots.permanence||{}).nb||0, reqAstr=(DB.slots.astreinte||{}).nb||0;
+  const fill=(c,r)=>r>0?`<span style="margin-left:8px;font-size:10px;font-weight:700;padding:1px 7px;border-radius:99px;letter-spacing:0;${c<r?"background:var(--danger-soft);color:var(--danger)":"background:var(--accent-soft);color:var(--ok)"}">${c}/${r}${c<r?" · non pourvu":""}</span>`:"";
   const todayTag=isToday(d)?"<small>aujourd'hui</small>":"";
   let absBlk=""; if(absEvs.length){ absBlk=`<div class="slot"><div class="sh"><span class="cdot" style="background:${colorOf("absence")}"></span>Absences & statuts</div><div class="tris">`+
     absEvs.flatMap(e=>e.agentIds.map(id=>`<span class="tag ${adm?"ed":""}" style="background:${colorOf(e.type)}" ${adm?`onclick="event.stopPropagation();openEventModal('${e.id}')"`:""}>${esc(triOf(id))} · ${esc(TYPES[e.type].short)}</span>`)).join("")+`</div></div>`; }
@@ -565,8 +570,8 @@ function dayBlock(d){
     miss.map(x=>`<div class="mline" onclick="event.stopPropagation();openMissionModal('${x.id}')">• <b>${esc(x.type)}</b> ${x.debut?esc(x.debut):""}${x.lieu?" · "+esc(x.lieu):""}${x.agentIds.length?" · "+x.agentIds.map(triOf).join(","):""}</div>`).join("")+`</div>`; }
   return `<div class="dayblock"><div class="dh"><div class="dt">${fmtLong(d)}${todayTag}</div>
     ${adm?`<button class="btn sec sm" onclick="openEventModal(null,'${ds}')">+ Événement</button>`:""}</div>
-    <div class="slot"><div class="sh"><span class="cdot" style="background:${colorOf("permanence")}"></span>Permanence<span class="time tnum">${esc(DB.slots.permanence.debut)}–${esc(DB.slots.permanence.fin)}</span></div>${tagsFor(perm)}</div>
-    <div class="slot"><div class="sh"><span class="cdot" style="background:${colorOf("astreinte")}"></span>Astreinte<span class="time tnum">${esc(DB.slots.astreinte.debut)}–${esc(DB.slots.astreinte.fin)}</span></div>${tagsFor(astr)}</div>
+    <div class="slot"><div class="sh"><span class="cdot" style="background:${colorOf("permanence")}"></span>Permanence${fill(cntPerm,reqPerm)}<span class="time tnum">${esc(DB.slots.permanence.debut)}–${esc(DB.slots.permanence.fin)}</span></div>${tagsFor(perm)}</div>
+    <div class="slot"><div class="sh"><span class="cdot" style="background:${colorOf("astreinte")}"></span>Astreinte${fill(cntAstr,reqAstr)}<span class="time tnum">${esc(DB.slots.astreinte.debut)}–${esc(DB.slots.astreinte.fin)}</span></div>${tagsFor(astr)}</div>
     ${absBlk}${missBlk}</div>`;
 }
 function openDay(ds){ cursor=parseYmd(ds); planMode="jour"; renderPlanning(); }
@@ -625,7 +630,7 @@ function drawMissions(){ const q=missionFilter.q.toLowerCase();
   el.innerHTML=list.length?list.map(m=>`<div class="item" onclick="openMissionModal('${m.id}')">
     <div class="badge" style="background:var(--slate)">${esc(m.type.slice(0,3).toUpperCase())}</div>
     <div class="meta"><div class="nm">${esc(m.type)}${m.agentIds.length?` · <span style="color:var(--ink-2);font-weight:500">${m.agentIds.map(triOf).join(", ")}</span>`:""}</div>
-    <div class="det tnum">${fmtLong(parseYmd(m.date))}${m.debut?" · "+esc(m.debut):""}${m.fin?"–"+esc(m.fin):""}${m.lieu?" · "+esc(m.lieu):""}${m.opj?" · OPJ "+esc(m.opj):""}</div></div>
+    <div class="det tnum">${fmtLong(parseYmd(m.date))}${m.debut?" · "+esc(m.debut):""}${m.fin?"–"+esc(m.fin):""}${m.lieu?" · "+esc(m.lieu):""}${m.opj?" · OPJ "+esc(m.opj):""}${m.vehicleId&&vehById(m.vehicleId)?" · "+esc(vehById(m.vehicleId).nom):""}</div></div>
     <span class="chev">›</span></div>`).join("")
     :`<div class="empty"><svg class="ic" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M3 7a1 1 0 0 1 1-1h5l2 2h8a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7Z"/></svg>Aucune mission ne correspond.<div class="sm">Bouton « + Mission » pour en créer une.</div></div>`;
 }
@@ -642,6 +647,7 @@ function openMissionModal(id){
     <div class="grid2"><div><label>Heure début *</label><input id="mDebut" type="time" class="fld" value="${m?.debut||""}" ${dis}></div>
     <div><label>Heure fin</label><input id="mFin" type="time" class="fld" value="${m?.fin||""}" ${dis}></div></div>
     <label>OPJ demandeur</label><input id="mOpj" class="fld" value="${esc(m?.opj||"")}" placeholder="Nom de l'OPJ" ${dis}>
+    <label>Véhicule</label><select id="mVeh" class="fld" ${dis}><option value="">— aucun —</option>${DB.vehicles.map(v=>`<option value="${v.id}" ${m?.vehicleId===v.id?"selected":""}>${esc(v.nom)}${v.immat?" ("+esc(v.immat)+")":""}</option>`).join("")}</select>
     <label>Commentaires</label><textarea id="mComment" class="fld" placeholder="Précisions…" ${dis}>${esc(m?.comment||"")}</textarea>
     <label>Affectation</label><div class="agpick" id="mAgents">${chips}</div>
     ${ro?`<button class="btn sec" style="margin-top:15px;width:100%" onclick="closeModal()">Fermer</button>`
@@ -652,6 +658,7 @@ function openMissionModal(id){
 }
 function saveMission(id){ const o={type:$("#mType").value,date:$("#mDate").value,debut:$("#mDebut").value,fin:$("#mFin").value,
   lieu:$("#mLieu").value.trim(),opj:$("#mOpj").value.trim(),comment:$("#mComment").value.trim(),
+  vehicleId:($("#mVeh")?$("#mVeh").value:"")||"",
   agentIds:[...$("#mAgents").querySelectorAll(".chip.on")].map(c=>c.dataset.id)};
   if(!o.date||!o.debut){ toast("Date et heure de début obligatoires"); return; }
   if(id){ Object.assign(DB.missions.find(x=>x.id===id),o); logActivity(`Mission modifiée : ${o.type} le ${o.date}`); }
@@ -698,6 +705,56 @@ function saveAgent(id){ const nom=$("#aNom").value.trim(),prenom=$("#aPrenom").v
 function delAgent(id){ if(!confirm("Supprimer cet agent du planning ?")) return;
   DB.events=DB.events.filter(e=>{e.agentIds=e.agentIds.filter(x=>x!==id);return e.agentIds.length;});
   DB.agents=DB.agents.filter(a=>a.id!==id); save(); closeModal(); renderEffectifs(); toast("Agent supprimé"); }
+
+/* ===== RESSOURCES (véhicules & matériel) ===== */
+const vehById=id=>(DB.vehicles||[]).find(v=>v.id===id);
+function renderRessources(){
+  const adm=isAdmin();
+  const vehs=(DB.vehicles||[]).slice().sort((a,b)=>a.nom.localeCompare(b.nom));
+  const mats=(DB.materiel||[]).slice().sort((a,b)=>a.nom.localeCompare(b.nom));
+  const vList=vehs.length?vehs.map(v=>`<div class="item" ${adm?`onclick="openVehicle('${v.id}')"`:""}>
+      <div class="badge" style="background:${v.dispo===false?"var(--danger)":"var(--accent)"}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7"><path d="M3 13l2-5a2 2 0 0 1 2-1.3h10A2 2 0 0 1 19 8l2 5"/><path d="M3 13h18v5h-3M3 13v5h3"/><circle cx="7" cy="18" r="1.6"/><circle cx="17" cy="18" r="1.6"/></svg></div>
+      <div class="meta"><div class="nm">${esc(v.nom)} ${v.dispo===false?'<span class="rolepill user" style="background:var(--danger-soft);color:var(--danger)">Indispo</span>':""}</div>
+      <div class="det">${esc(v.immat||"—")}${v.notes?" · "+esc(v.notes):""}</div></div>${adm?'<span class="chev">›</span>':""}</div>`).join("")
+    :`<div class="empty"><svg class="ic" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M3 13l2-5a2 2 0 0 1 2-1.3h10A2 2 0 0 1 19 8l2 5"/><path d="M3 13h18v5h-3M3 13v5h3"/></svg>Aucun véhicule.</div>`;
+  const mList=mats.length?mats.map(x=>`<div class="item" ${adm?`onclick="openMateriel('${x.id}')"`:""}>
+      <div class="badge" style="background:var(--slate)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7"><path d="M21 16V8a2 2 0 0 0-1-1.7l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.7l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/></svg></div>
+      <div class="meta"><div class="nm">${esc(x.nom)}${x.quantite?` <span style="color:var(--ink-2);font-weight:500">×${esc(x.quantite)}</span>`:""}</div>
+      <div class="det">${esc(x.notes||"—")}</div></div>${adm?'<span class="chev">›</span>':""}</div>`).join("")
+    :`<div class="empty"><svg class="ic" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M21 16V8a2 2 0 0 0-1-1.7l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.7l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/></svg>Aucun matériel.</div>`;
+  $("#view-ressources").innerHTML=screenHead("Ressources","Véhicules & matériel du service")+
+    `<div class="card"><h3>Véhicules ${adm?`<button class="btn sec sm" style="float:right;margin-top:-4px" onclick="openVehicle()">+ Véhicule</button>`:""}</h3>${vList}</div>
+     <div class="card"><h3>Matériel ${adm?`<button class="btn sec sm" style="float:right;margin-top:-4px" onclick="openMateriel()">+ Matériel</button>`:""}</h3>${mList}</div>`;
+}
+function openVehicle(id){ if(!isAdmin())return; const v=id?vehById(id):null;
+  showModal(`<h3>${id?"Modifier le véhicule":"Nouveau véhicule"}</h3>
+    <label>Nom / désignation *</label><input id="vNom" class="fld" value="${esc(v?.nom||"")}" placeholder="Ex : Kangoo 1">
+    <label>Immatriculation</label><input id="vImmat" class="fld" value="${esc(v?.immat||"")}" placeholder="AB-123-CD">
+    <label>Notes</label><input id="vNotes" class="fld" value="${esc(v?.notes||"")}" placeholder="Affectation, particularités…">
+    <div class="switch" style="margin-top:14px"><div class="lab">Disponible</div><div class="tog ${v?.dispo===false?"":"on"}" id="vDispo" onclick="this.classList.toggle('on')"></div></div>
+    <div class="btn-row"><button class="btn" onclick="saveVehicle('${id||""}')">Enregistrer</button>
+    ${id?`<button class="btn danger sm" onclick="delVehicle('${id}')">Supprimer</button>`:""}</div>
+    <button class="btn sec" style="margin-top:9px;width:100%" onclick="closeModal()">Annuler</button>`); }
+function saveVehicle(id){ const nom=$("#vNom").value.trim(); if(!nom){ toast("Nom requis"); return; }
+  const o={nom,immat:$("#vImmat").value.trim(),notes:$("#vNotes").value.trim(),dispo:$("#vDispo").classList.contains("on")};
+  if(id) Object.assign(vehById(id),o); else DB.vehicles.push(Object.assign({id:uid()},o));
+  save(); closeModal(); renderRessources(); toast("Véhicule enregistré"); }
+function delVehicle(id){ if(!confirm("Supprimer ce véhicule ?")) return;
+  DB.vehicles=DB.vehicles.filter(v=>v.id!==id); save(); closeModal(); renderRessources(); toast("Véhicule supprimé"); }
+function openMateriel(id){ if(!isAdmin())return; const x=id?(DB.materiel||[]).find(m=>m.id===id):null;
+  showModal(`<h3>${id?"Modifier le matériel":"Nouveau matériel"}</h3>
+    <label>Désignation *</label><input id="xNom" class="fld" value="${esc(x?.nom||"")}" placeholder="Ex : Kit de prélèvement">
+    <label>Quantité</label><input id="xQte" type="number" min="0" class="fld" value="${esc(x?.quantite||"")}" placeholder="Ex : 5">
+    <label>Notes</label><input id="xNotes" class="fld" value="${esc(x?.notes||"")}" placeholder="Emplacement, état…">
+    <div class="btn-row"><button class="btn" onclick="saveMateriel('${id||""}')">Enregistrer</button>
+    ${id?`<button class="btn danger sm" onclick="delMateriel('${id}')">Supprimer</button>`:""}</div>
+    <button class="btn sec" style="margin-top:9px;width:100%" onclick="closeModal()">Annuler</button>`); }
+function saveMateriel(id){ const nom=$("#xNom").value.trim(); if(!nom){ toast("Désignation requise"); return; }
+  const o={nom,quantite:$("#xQte").value.trim(),notes:$("#xNotes").value.trim()};
+  if(id) Object.assign((DB.materiel||[]).find(m=>m.id===id),o); else DB.materiel.push(Object.assign({id:uid()},o));
+  save(); closeModal(); renderRessources(); toast("Matériel enregistré"); }
+function delMateriel(id){ if(!confirm("Supprimer ce matériel ?")) return;
+  DB.materiel=DB.materiel.filter(m=>m.id!==id); save(); closeModal(); renderRessources(); toast("Matériel supprimé"); }
 
 /* ===== RÉGLAGES ===== */
 function renderParams(){
@@ -808,8 +865,8 @@ async function toggleRole(id,role){ const nr=role==="admin"?"user":"admin";
 function dl(name,content,mime){ const b=new Blob(["\ufeff"+content],{type:mime}),u=URL.createObjectURL(b),a=document.createElement("a");
   a.href=u; a.download=name; a.click(); setTimeout(()=>URL.revokeObjectURL(u),1500); toast("Fichier généré"); }
 const cell=s=>`"${String(s??"").replace(/"/g,'""')}"`;
-function exportMissionsCSV(){ const rows=[["Type","Date","Début","Fin","Lieu","OPJ","Agents","Commentaires"]];
-  DB.missions.forEach(m=>rows.push([m.type,m.date,m.debut,m.fin,m.lieu,m.opj,m.agentIds.map(triOf).join(" "),m.comment]));
+function exportMissionsCSV(){ const rows=[["Type","Date","Début","Fin","Lieu","OPJ","Véhicule","Agents","Commentaires"]];
+  DB.missions.forEach(m=>rows.push([m.type,m.date,m.debut,m.fin,m.lieu,m.opj,(m.vehicleId&&vehById(m.vehicleId)?vehById(m.vehicleId).nom:""),m.agentIds.map(triOf).join(" "),m.comment]));
   dl("missions.csv",rows.map(r=>r.map(cell).join(";")).join("\r\n"),"text/csv"); }
 function exportPlanningCSV(){ const rows=[["Date","Type","Agents"]];
   DB.events.slice().sort((a,b)=>a.date.localeCompare(b.date)).forEach(e=>rows.push([e.date,TYPES[e.type].label,e.agentIds.map(triOf).join(" ")]));
