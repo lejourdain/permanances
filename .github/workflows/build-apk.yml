@@ -15,11 +15,28 @@ jobs:
           distribution: temurin
           java-version: "17"
       - run: npm install
+      - run: npm install --no-save @capacitor/assets
       - run: npx cap add android
+      - run: npx @capacitor/assets generate --android || echo "assets: ignore"
       - run: npx cap sync android
-      - run: cd android && chmod +x ./gradlew && ./gradlew assembleDebug
+      - run: cd android && chmod +x ./gradlew && ./gradlew assembleRelease
+      - name: Signer l'APK (release)
+        env:
+          KS_B64: ${{ secrets.KEYSTORE_BASE64 }}
+          KS_PASS: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASS: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          if [ -z "$KS_B64" ]; then echo "::error::Secrets de signature manquants (KEYSTORE_BASE64, ...)"; exit 1; fi
+          echo "$KS_B64" | base64 -d > release.keystore
+          BT=$(ls -d $ANDROID_HOME/build-tools/*/ | sort -V | tail -1)
+          UNSIGNED=$(ls android/app/build/outputs/apk/release/*.apk | head -1)
+          "${BT}zipalign" -f 4 "$UNSIGNED" aligned.apk
+          "${BT}apksigner" sign --ks release.keystore --ks-pass env:KS_PASS \
+            --ks-key-alias "$KEY_ALIAS" --key-pass env:KEY_PASS --out Permanences.apk aligned.apk
+          "${BT}apksigner" verify Permanences.apk && echo "Signature vérifiée"
       - uses: actions/upload-artifact@v4
         with:
           name: Permanences-APK
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          path: Permanences.apk
           if-no-files-found: error
