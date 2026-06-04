@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Compte confirmé</title>
+<style>
+:root{--bg:#e9ebee;--surface:#fff;--ink:#1c2530;--ink2:#586170;--ink3:#8a929d;--line:#d3d8df;--line2:#c2c8d1;--accent:#2f5277;--ok:#2f7d57;--danger:#b23b3b}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:ui-sans-serif,system-ui,"Segoe UI",Roboto,Arial,sans-serif;font-size:14.5px;display:flex;min-height:100vh;align-items:center;justify-content:center;padding:24px}
+.card{width:100%;max-width:380px;background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:26px 22px;text-align:center}
+.mark{width:56px;height:56px;border:1px solid var(--line2);border-radius:50%;display:grid;place-items:center;margin:0 auto 16px}
+h1{font-size:19px;font-weight:600;margin:0 0 6px}
+p{color:var(--ink2);font-size:13px;margin:6px 0}
+.ok{color:var(--ok);font-weight:600}
+.err{color:var(--danger);font-weight:600}
+.foot{color:var(--ink3);font-size:11px;margin-top:18px}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="mark" id="mark">
+    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#2f7d57" stroke-width="2"><path d="M5 13l4 4L19 7"/></svg>
+  </div>
+  <h1 id="title">Compte confirmé</h1>
+  <p id="msg">Votre adresse e-mail a bien été validée.</p>
+  <p><b>Retournez à l'application « Gestion des permanences » et connectez-vous</b> avec votre e-mail et votre mot de passe.</p>
+  <div class="foot">Vous pouvez fermer cette page.</div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL="https://iuzyerrmblumrmhenivn.supabase.co";
+const SUPABASE_ANON_KEY="sb_publishable_x-FQXc7K-EUG8EWBa3pGlA_ZHY-ODF8";
+// La confirmation est gérée automatiquement par Supabase à l'ouverture du lien.
+// On se contente d'afficher un message clair ; en cas d'échec on le signale.
+try{
+  const sb=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{auth:{persistSession:false,detectSessionInUrl:true,flowType:"implicit"}});
+  const hasErr = location.hash.indexOf("error")>=0 || location.search.indexOf("error")>=0;
+  if(hasErr){
+    document.getElementById("mark").innerHTML='<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#b23b3b" stroke-width="2"><path d="M6 6l12 12M18 6 6 18"/></svg>';
+    document.getElementById("title").textContent="Lien invalide ou expiré";
+    document.getElementById("msg").innerHTML='<span class="err">Le lien de confirmation a expiré.</span>';
+  }
+  // Déconnexion immédiate : la confirmation ne doit pas laisser une session ouverte ici.
+  sb.auth.signOut().catch(()=>{});
+}catch(e){}
+</script>
+</body>
+</html>
