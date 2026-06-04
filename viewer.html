@@ -96,3 +96,101 @@ load();
 </script>
 </body>
 </html>
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Consultation du planning</title>
+<style>
+:root{--bg:#e9ebee;--surface:#fff;--ink:#1c2530;--ink2:#586170;--ink3:#8a929d;--line:#d3d8df;--slate:#1b2533;--accent:#2f5277}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:ui-sans-serif,system-ui,"Segoe UI",Roboto,Arial,sans-serif;font-size:14.5px;line-height:1.5}
+header{background:var(--slate);color:#eef1f5;padding:16px}
+header .w{max-width:860px;margin:0 auto;display:flex;align-items:center;gap:12px}
+header .t{font-size:15px;font-weight:600}header .s{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:#93a1b8;margin-top:2px}
+.ro{margin-left:auto;font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:#9fb3cf;border:1px solid #ffffff26;padding:5px 9px;border-radius:3px}
+main{max-width:860px;margin:0 auto;padding:18px 14px 60px}
+h2{font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink3);margin:24px 0 10px;font-weight:700}
+.bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:8px}
+.bar .m{font-size:16px;font-weight:600;text-transform:capitalize}
+button.nav{width:32px;height:32px;border:1px solid var(--line);background:var(--surface);border-radius:3px;font-size:16px;cursor:pointer;color:var(--ink)}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.dow{text-align:center;font-size:10px;color:var(--ink3);font-weight:700;text-transform:uppercase}
+.day{background:var(--surface);border:1px solid var(--line);border-radius:3px;min-height:64px;padding:4px;overflow:hidden}
+.day.out{background:#f1f2f5;color:var(--ink3)}.day.we{background:#eef0f3}
+.num{font-size:11px;color:var(--ink2);font-weight:700;text-align:right}
+.pill{font-size:9px;font-weight:700;color:#fff;border-radius:2px;padding:2px 3px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.legend{display:flex;flex-wrap:wrap;gap:9px;margin-top:12px;background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:11px}
+.legend span{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--ink2)}
+.legend i{width:11px;height:11px;border-radius:2px}
+table{width:100%;border-collapse:collapse;background:var(--surface);font-size:13px;border:1px solid var(--line);border-radius:4px;overflow:hidden}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)}
+th{background:#f4f5f7;font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink2)}
+tr:last-child td{border-bottom:none}
+.tagm{background:var(--slate);color:#fff;padding:1px 6px;border-radius:2px;font-size:11px;font-weight:700}
+.msg{max-width:560px;margin:60px auto;text-align:center;color:var(--ink2);background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:30px}
+.foot{text-align:center;color:var(--ink3);font-size:11px;margin-top:24px}
+</style>
+</head>
+<body>
+<header><div class="w"><div><div class="t" id="svc">Planning</div><div class="s">Consultation</div></div><div class="ro">Lecture seule</div></div></header>
+<main id="root"><div class="msg">Chargement…</div></main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL="https://iuzyerrmblumrmhenivn.supabase.co";
+const SUPABASE_ANON_KEY="sb_publishable_x-FQXc7K-EUG8EWBa3pGlA_ZHY-ODF8";
+const TYPES={permanence:{l:"Permanence",s:"PERM"},astreinte:{l:"Astreinte",s:"ASTR"},absence:{l:"Absence",s:"ABS"},stage:{l:"Stage",s:"STG"},cmo:{l:"CMO",s:"CMO"},ro:{l:"RO / ROPN",s:"RO"},tt:{l:"Télétravail",s:"TT"}};
+const MOIS=["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
+const JOURS=["lun","mar","mer","jeu","ven","sam","dim"],JOURS_L=["lundi","mardi","mercredi","jeudi","vendredi","samedi","dimanche"];
+const pad=n=>String(n).padStart(2,"0");
+const ymd=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const parseYmd=s=>{const[y,m,dd]=s.split("-").map(Number);return new Date(y,m-1,dd);};
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]));
+function addDays(d,n){const x=new Date(d);x.setDate(x.getDate()+n);return x;}
+function startWeek(d){const x=new Date(d);x.setDate(x.getDate()-((x.getDay()+6)%7));x.setHours(0,0,0,0);return x;}
+let DB=null,cursor=new Date();
+const colorOf=t=>(DB.colors&&DB.colors[t])||"#888";
+const triOf=id=>{const a=(DB.agents||[]).find(a=>a.id===id);return a?a.trigramme:"???";};
+
+function token(){ const m=location.search.match(/[?&]t=([^&]+)/); return m?decodeURIComponent(m[1]):""; }
+async function load(){
+  const t=token();
+  if(!t){ document.getElementById("root").innerHTML='<div class="msg">Lien invalide : jeton manquant.</div>'; return; }
+  if(typeof supabase==="undefined"){ document.getElementById("root").innerHTML='<div class="msg">Impossible de charger la bibliothèque.</div>'; return; }
+  const sb=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{auth:{persistSession:false}});
+  try{
+    const {data,error}=await sb.rpc("public_view",{p_token:t});
+    if(error) throw error;
+    if(!data){ document.getElementById("root").innerHTML='<div class="msg">Lien expiré ou révoqué.</div>'; return; }
+    DB=data; document.getElementById("svc").textContent=DB.serviceName||"Planning";
+    render();
+  }catch(e){ document.getElementById("root").innerHTML='<div class="msg">Consultation indisponible (réseau ou lien révoqué).</div>'; }
+}
+function shift(n){ cursor=new Date(cursor.getFullYear(),cursor.getMonth()+n,1); render(); }
+function render(){
+  const y=cursor.getFullYear(),m=cursor.getMonth(),start=startWeek(new Date(y,m,1));
+  const evOn=ds=>(DB.events||[]).filter(e=>e.date===ds);
+  let cal=`<div class="cal">`+JOURS.map(j=>`<div class="dow">${j}</div>`).join("");
+  for(let i=0;i<42;i++){ const d=addDays(start,i),ds=ymd(d),inM=d.getMonth()===m,we=[0,6].includes(d.getDay());
+    const evs=evOn(ds).slice(0,3).map(e=>{const tr=(e.agentIds||[]).map(triOf).join(",");
+      return `<div class="pill" style="background:${colorOf(e.type)}">${(TYPES[e.type]||{}).s||""}${tr?" "+esc(tr):""}</div>`;}).join("");
+    cal+=`<div class="day ${inM?"":"out"} ${we?"we":""}"><div class="num">${d.getDate()}</div>${evs}</div>`; }
+  cal+=`</div>`;
+  const legend=`<div class="legend">`+Object.entries(TYPES).map(([k,v])=>`<span><i style="background:${colorOf(k)}"></i>${v.l}</span>`).join("")+`</div>`;
+  const today=new Date(),end=addDays(today,60);
+  const miss=(DB.missions||[]).filter(x=>{const d=parseYmd(x.date);return d>=parseYmd(ymd(today))&&d<=end;})
+    .sort((a,b)=>(a.date+(a.debut||"")).localeCompare(b.date+(b.debut||"")));
+  const mrows=miss.length?miss.map(x=>`<tr><td>${esc(JOURS_L[(parseYmd(x.date).getDay()+6)%7])} ${parseYmd(x.date).getDate()} ${MOIS[parseYmd(x.date).getMonth()].slice(0,4)}.${x.debut?" "+esc(x.debut):""}</td>
+    <td><span class="tagm">${esc((x.type||"").slice(0,4).toUpperCase())}</span> ${esc(x.type||"")}</td><td>${esc(x.lieu||"")}</td><td>${esc((x.agentIds||[]).map(triOf).join(", "))}</td></tr>`).join("")
+    :`<tr><td colspan="4" style="color:var(--ink3)">Aucune mission à venir.</td></tr>`;
+  document.getElementById("root").innerHTML=
+    `<div class="bar"><button class="nav" onclick="shift(-1)">‹</button><div class="m">${MOIS[m]} ${y}</div><button class="nav" onclick="shift(1)">›</button></div>`+
+    cal+legend+
+    `<h2>Missions à venir</h2><table><thead><tr><th>Date</th><th>Type</th><th>Lieu</th><th>Agents</th></tr></thead><tbody>${mrows}</tbody></table>`+
+    `<div class="foot">Vue en lecture seule · données mises à jour automatiquement</div>`;
+}
+load();
+</script>
+</body>
+</html>
