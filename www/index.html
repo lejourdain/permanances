@@ -243,15 +243,18 @@ details.cfg summary::-webkit-details-marker{display:none}
       <div class="tl">Permanences · Astreintes · Missions</div>
     </div>
     <div class="panel">
-      <label>Identifiant / pseudo</label>
-      <input id="liPseudo" class="fld" placeholder="Votre identifiant" autocomplete="username">
+      <label>Adresse e-mail</label>
+      <input id="liEmail" class="fld" type="email" placeholder="prenom.nom@service.fr" autocomplete="email">
       <label>Mot de passe</label>
       <input id="liPwd" class="fld" type="password" placeholder="Votre mot de passe" autocomplete="current-password">
+      <label>Pseudo / trigramme <span style="text-transform:none;font-weight:400;color:var(--ink-3)">(à l'inscription)</span></label>
+      <input id="liPseudo" class="fld" placeholder="Ex : MRT" autocomplete="nickname">
       <div style="height:16px"></div>
       <button class="btn dark" onclick="doLogin()">Se connecter</button>
       <div class="msg" id="liMsg"></div>
-      <button class="btn sec" style="margin-top:8px" onclick="openForgot()">Mot de passe oublié ?</button>
-      <div class="sec-line"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="10" width="16" height="11" rx="1"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Comptes individuels — mot de passe chiffré et vérifié</div>
+      <div class="btn-row" style="margin-top:8px"><button class="btn sec" onclick="doSignup()">Créer un compte</button>
+      <button class="btn sec" onclick="openForgot()">Mot de passe oublié ?</button></div>
+      <div class="sec-line"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="10" width="16" height="11" rx="1"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Connexion par e-mail — réinitialisation par e-mail</div>
       <details class="cfg"><summary>Configuration de la base de données</summary>
         <label>URL Supabase</label><input id="liUrl" class="fld" placeholder="https://xxxx.supabase.co">
         <label>Clé publique</label><input id="liKey" class="fld" placeholder="clé anon / publishable">
@@ -330,12 +333,14 @@ let tab="planning",planMode="mois",cursor=new Date();
 let missionFilter={date:"",type:"",agent:"",q:""};
 
 /* ===== Session & base ===== */
-let session={pseudo:"",password:"",role:"user"}, sb=null, lastSync=0, pollTimer=null, pushTimer=null, applying=false;
+let session={userId:"",email:"",pseudo:"",role:"user"}, sb=null, lastSync=0, pollTimer=null, pushTimer=null, applying=false;
 const isAdmin=()=>session.role==="admin";
+const RESET_REDIRECT="https://lejourdain.github.io/permanances/reset.html";
 function getCfg(){ let url=SUPABASE_URL,key=SUPABASE_ANON_KEY; const o=Store.get("permCfg");
   if(o){ try{ const c=JSON.parse(o); url=c.url||url; key=c.key||key; }catch(e){} } return {url,key}; }
 function cloudReady(){ const c=getCfg(); return !!(c.url&&c.key&&typeof supabase!=="undefined"&&supabase.createClient); }
-function makeClient(){ if(sb) return sb; const c=getCfg(); sb = cloudReady()?supabase.createClient(c.url,c.key,{auth:{persistSession:false}}):null; return sb; }
+function makeClient(){ if(sb) return sb; const c=getCfg();
+  sb = cloudReady()?supabase.createClient(c.url,c.key,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}}):null; return sb; }
 function cacheKey(){ return "permApp:shared"; }
 function saveLocal(){ Store.set(cacheKey(),JSON.stringify({data:DB,ts:lastSync})); }
 function loadLocal(){ const r=Store.get(cacheKey()); if(r){ try{ const o=JSON.parse(r); DB=Object.assign(defaultDB(),o.data); lastSync=o.ts||0; return true; }catch(e){} } return false; }
@@ -369,37 +374,71 @@ const colorOf=t=>DB.colors[t]||"#888";
 const eventsOn=ds=>DB.events.filter(e=>e.date===ds);
 const missionsOn=ds=>DB.missions.filter(m=>m.date===ds);
 
-/* ===== Connexion ===== */
+/* ===== Connexion (Supabase Auth — e-mail) ===== */
 function loginMsg(t,err){ const e=$("#liMsg"); if(e){ e.textContent=t||""; e.className="msg"+(err?" err":""); } }
-const isAuthErr=e=>{ const m=((e&&(e.message||e.hint))||"")+((e&&e.code)||""); return /AUTH|28000/.test(m); };
+function applyCfgFields(){ const cu=$("#liUrl"), ck=$("#liKey");
+  if(cu&&(cu.value.trim()||ck.value.trim())){ Store.set("permCfg",JSON.stringify({url:cu.value.trim(),key:ck.value.trim()})); sb=null; } }
 
-async function doLogin(){
-  const pseudo=$("#liPseudo").value.trim(), pwd=$("#liPwd").value;
-  if(!pseudo||!pwd){ loginMsg("Identifiant et mot de passe requis",true); return; }
-  const cu=$("#liUrl"), ck=$("#liKey");
-  if(cu&&(cu.value.trim()||ck.value.trim())) Store.set("permCfg",JSON.stringify({url:cu.value.trim(),key:ck.value.trim()}));
-  if(!cloudReady()){ loginMsg("Base de données injoignable (réseau ou configuration).",true); return; }
-  makeClient(); loginMsg("Connexion…"); let recoveryToShow=null;
-  try{
-    const {data,error}=await sb.rpc("auth_login",{p_pseudo:pseudo,p_password:pwd});
-    if(error) throw error;
-    if(data.status==="wrong"){ loginMsg("Mot de passe incorrect",true); return; }
-    let role=data.role;
-    if(data.status==="new"){
-      if(!confirm("Aucun compte « "+pseudo+" ». Créer ce compte ?")){ loginMsg(""); return; }
-      if(pwd.length<4){ loginMsg("Mot de passe trop court (4 caractères min.)",true); return; }
-      const {data:r,error:er}=await sb.rpc("auth_register",{p_pseudo:pseudo,p_password:pwd});
-      if(er) throw er; role=r.role; recoveryToShow=r.recovery;
-    }
-    session={pseudo,password:pwd,role:role||"user"};
-    const {data:pdata,error:e2}=await sb.rpc("service_pull",{p_pseudo:pseudo,p_password:pwd});
-    if(e2) throw e2;
-    DB=Object.assign(defaultDB(), pdata||{}); lastSync=Date.now(); saveLocal(); enterApp();
-    if(recoveryToShow) showRecovery(recoveryToShow);
-  }catch(e){ loginMsg("Connexion impossible (réseau ou base).",true); }
+async function afterAuth(){
+  const {data:{user}}=await sb.auth.getUser();
+  if(!user){ loginMsg("Session invalide",true); return; }
+  session.userId=user.id; session.email=user.email||"";
+  try{ const {data:prof}=await sb.from("profiles").select("role,pseudo").eq("id",user.id).single();
+       session.role=(prof&&prof.role)||"user"; session.pseudo=(prof&&prof.pseudo)||session.email.split("@")[0]; }
+  catch(e){ session.role="user"; session.pseudo=session.email.split("@")[0]; }
+  await pullData(); enterApp();
 }
+async function pullData(){
+  try{ const {data,error}=await sb.from("services").select("data,updated_at").eq("code","shared-service-main").maybeSingle();
+       if(error) throw error;
+       if(data){ DB=Object.assign(defaultDB(),data.data||{}); lastSync=new Date(data.updated_at).getTime(); }
+       else { DB=defaultDB(); lastSync=Date.now(); }
+       saveLocal();
+  }catch(e){ if(!loadLocal()){ DB=defaultDB(); } }
+}
+async function doLogin(){
+  const email=$("#liEmail").value.trim(), pwd=$("#liPwd").value;
+  if(!email||!pwd){ loginMsg("E-mail et mot de passe requis",true); return; }
+  applyCfgFields();
+  if(!cloudReady()){ loginMsg("Base injoignable (réseau ou configuration).",true); return; }
+  makeClient(); loginMsg("Connexion…");
+  try{
+    const {error}=await sb.auth.signInWithPassword({email,password:pwd});
+    if(error){
+      if(/not confirmed/i.test(error.message)){ loginMsg("E-mail non confirmé : cliquez le lien reçu par mail.",true); return; }
+      loginMsg("E-mail ou mot de passe incorrect",true); return;
+    }
+    await afterAuth();
+  }catch(e){ loginMsg("Connexion impossible (réseau).",true); }
+}
+async function doSignup(){
+  const email=$("#liEmail").value.trim(), pwd=$("#liPwd").value, pseudo=$("#liPseudo").value.trim();
+  if(!email||!pwd){ loginMsg("E-mail et mot de passe requis",true); return; }
+  if(pwd.length<6){ loginMsg("Mot de passe : 6 caractères minimum",true); return; }
+  applyCfgFields();
+  if(!cloudReady()){ loginMsg("Base injoignable (réseau ou configuration).",true); return; }
+  makeClient(); loginMsg("Création du compte…");
+  try{
+    const {data,error}=await sb.auth.signUp({email,password:pwd,options:{data:{pseudo},emailRedirectTo:RESET_REDIRECT}});
+    if(error){ loginMsg(/registered/i.test(error.message)?"Un compte existe déjà avec cet e-mail":("Échec : "+error.message),true); return; }
+    if(data.session){ await afterAuth(); }
+    else { loginMsg("Compte créé. Vérifiez votre boîte mail pour confirmer, puis connectez-vous."); }
+  }catch(e){ loginMsg("Création impossible (réseau).",true); }
+}
+async function doForgot(){
+  const email=($("#fgEmail")?$("#fgEmail").value:$("#liEmail").value).trim();
+  if(!email){ toast("Saisissez votre e-mail"); return; }
+  applyCfgFields(); if(!cloudReady()){ toast("Base injoignable"); return; } makeClient();
+  try{ await sb.auth.resetPasswordForEmail(email,{redirectTo:RESET_REDIRECT}); }catch(e){}
+  closeModal(); loginMsg("Si un compte existe, un e-mail de réinitialisation a été envoyé.");
+}
+function openForgot(){ showModal(`<h3>Réinitialiser le mot de passe</h3>
+  <div class="msub">Un lien de réinitialisation vous sera envoyé par e-mail.</div>
+  <label>Adresse e-mail</label><input id="fgEmail" class="fld" type="email" autocomplete="email">
+  <div class="btn-row"><button class="btn" onclick="doForgot()">Envoyer le lien</button></div>
+  <button class="btn sec" style="margin-top:9px;width:100%" onclick="closeModal()">Annuler</button>`); }
+
 function enterApp(){
-  Store.set("permSession",JSON.stringify(session));
   $("#login").classList.add("hidden"); $("#app").classList.remove("hidden");
   $("#hdrSub").textContent=DB.serviceName||"Service";
   $("#hdrUser").textContent=session.pseudo;
@@ -408,46 +447,33 @@ function enterApp(){
   if(sb){ syncState("ok","synchronisé"); startPoll(); } else { syncState("off","local"); }
   $("#liPwd").value=""; updateBadge(); go("planning");
 }
-function logout(){
-  if(pollTimer) clearInterval(pollTimer); pollTimer=null; sb=null;
-  Store.del("permSession"); session={pseudo:"",password:"",role:"user"}; DB=defaultDB();
+async function logout(){
+  if(pollTimer) clearInterval(pollTimer); pollTimer=null;
+  try{ if(sb) await sb.auth.signOut(); }catch(e){}
+  session={userId:"",email:"",pseudo:"",role:"user"}; DB=defaultDB();
   $("#app").classList.add("hidden"); $("#login").classList.remove("hidden");
-  $("#liPseudo").value=""; $("#liPwd").value=""; loginMsg("");
+  const em=$("#liEmail"); if(em) em.value=""; $("#liPwd").value=""; const ps=$("#liPseudo"); if(ps) ps.value=""; loginMsg("");
 }
-async function relogin(){
-  const s=Store.get("permSession"); if(!s) return false;
-  try{ session=JSON.parse(s); if(!session.role) session.role="user"; }catch(e){ return false; }
-  if(!session.pseudo) return false;
-  if(cloudReady()){
-    makeClient();
-    try{
-      const {data:l}=await sb.rpc("auth_login",{p_pseudo:session.pseudo,p_password:session.password});
-      if(l&&l.status==="ok"&&l.role) session.role=l.role;
-      const {data,error}=await sb.rpc("service_pull",{p_pseudo:session.pseudo,p_password:session.password});
-      if(error) throw error;
-      DB=Object.assign(defaultDB(), data||{}); lastSync=Date.now(); saveLocal(); enterApp(); return true;
-    }catch(e){
-      if(isAuthErr(e)){ logout(); return false; }
-      if(loadLocal()){ sb=null; enterApp(); toast("Hors-ligne — données locales"); return true; }
-    }
-  }
+async function restoreSession(){
+  if(!cloudReady()) return false; makeClient();
+  try{ const {data:{session:s}}=await sb.auth.getSession(); if(s){ await afterAuth(); return true; } }catch(e){}
   return false;
 }
 async function pushNow(){
   if(!sb||applying) return;
-  try{ const {data,error}=await sb.rpc("service_push",{p_pseudo:session.pseudo,p_password:session.password,p_data:DB});
-    if(error) throw error; lastSync=new Date(data).getTime(); syncState("ok","synchronisé");
+  try{ const {error}=await sb.from("services").upsert({code:"shared-service-main",data:DB});
+    if(error) throw error; lastSync=Date.now(); syncState("ok","synchronisé");
   }catch(e){ syncState("off","hors-ligne"); }
 }
 function schedulePush(){ if(!sb) return; clearTimeout(pushTimer); pushTimer=setTimeout(pushNow,600); }
 function startPoll(){ if(pollTimer) clearInterval(pollTimer); pollTimer=setInterval(poll,15000); }
 async function poll(){
   if(!sb||applying||document.hidden) return;
-  try{ const {data,error}=await sb.rpc("service_when",{p_pseudo:session.pseudo,p_password:session.password});
+  try{ const {data,error}=await sb.from("services").select("updated_at").eq("code","shared-service-main").maybeSingle();
     if(error) throw error;
-    if(data){ const t=new Date(data).getTime();
-      if(t>lastSync+500){ const r=await sb.rpc("service_pull",{p_pseudo:session.pseudo,p_password:session.password});
-        if(!r.error&&r.data){ applying=true; DB=Object.assign(defaultDB(),r.data); lastSync=t; saveLocal(); applying=false; rerender(); updateBadge(); syncState("ok","mis à jour"); } } }
+    if(data){ const t=new Date(data.updated_at).getTime();
+      if(t>lastSync+500){ const r=await sb.from("services").select("data,updated_at").eq("code","shared-service-main").maybeSingle();
+        if(!r.error&&r.data){ applying=true; DB=Object.assign(defaultDB(),r.data.data||{}); lastSync=t; saveLocal(); applying=false; rerender(); updateBadge(); syncState("ok","mis à jour"); } } }
   }catch(e){ syncState("off","hors-ligne"); }
 }
 function rerender(){ ({planning:renderPlanning,missions:renderMissions,effectifs:renderEffectifs,params:renderParams}[tab]||(()=>{}))(); }
@@ -678,9 +704,9 @@ function renderParams(){
   const themeCard=`<div class="card"><h3>Apparence</h3>
     <div class="switch"><div class="lab">Mode sombre</div><div class="tog ${dark?"on":""}" onclick="toggleTheme()"></div></div></div>`;
   const accountCard=`<div class="card"><h3>Mon compte</h3>
-    <div class="note" style="margin:0 0 8px">Connecté en tant que <b>${esc(session.pseudo)}</b> — ${isAdmin()?"administrateur":"utilisateur"}.</div>
-    <button class="btn sec sm" onclick="openChangePwd()">Changer mon mot de passe</button>
-    <button class="btn sec sm" onclick="openRecovery()" style="margin-left:8px">Code de récupération</button></div>`;
+    <div class="note" style="margin:0 0 8px">Connecté : <b>${esc(session.email||session.pseudo)}</b> — ${isAdmin()?"administrateur":"utilisateur"}.</div>
+    <div class="tablebar"><button class="btn sec sm" onclick="openPseudo()">Modifier mon pseudo</button>
+    <button class="btn sec sm" onclick="openChangePwd()">Changer mon mot de passe</button></div></div>`;
   const dataCard=`<div class="card"><h3>Données & partage</h3>
     <div class="tablebar"><button class="btn sec sm" onclick="exportPlanningCSV()">Planning (CSV)</button>
     <button class="btn sec sm" onclick="exportMissionsCSV()">Missions (CSV)</button>
@@ -709,7 +735,12 @@ function renderParams(){
     <div class="card"><h3>Couleurs des événements</h3>${crows}</div>
     <div class="card"><h3>Comptes & rôles</h3>
       <div class="note" style="margin:0 0 10px">Gérez les rôles et réinitialisez les mots de passe.</div>
-      <div id="usersList"><button class="btn sec sm" onclick="loadUsers()">Charger les comptes</button></div></div>`+
+      <div id="usersList"><button class="btn sec sm" onclick="loadUsers()">Charger les comptes</button></div></div>
+    <div class="card"><h3>Lien de consultation (lecture seule)</h3>
+      <div class="note" style="margin:0 0 10px">Lien public pour consulter le planning sans compte (sans nom/prénom ni identifiants). À héberger via GitHub Pages — voir notice.</div>
+      <div class="tablebar"><button class="btn sec sm" onclick="shareGenerate()">Activer / régénérer</button>
+      <button class="btn sec sm" onclick="shareShow()">Afficher le lien</button>
+      <button class="btn sec sm" onclick="shareDisable()">Désactiver</button></div></div>`+
     accountCard+dataCard+
     `<div class="card"><h3>Évolutions</h3><div class="note">Notifications push (app fermée), lien public en direct, véhicules/matériel, réinitialisation par e-mail — voir note de livraison.</div></div>`;
 }
@@ -718,67 +749,59 @@ function saveService(){ DB.serviceName=$("#pName").value.trim()||"Service"; $("#
 function saveSlots(){ DB.slots.permanence={debut:$("#permD").value,fin:$("#permF").value,nb:+$("#permN").value||1};
   DB.slots.astreinte={debut:$("#astrD").value,fin:$("#astrF").value,nb:+$("#astrN").value||1}; save(); toast("Plages enregistrées"); }
 
-/* ----- récupération de mot de passe (libre-service par code) ----- */
-function showRecovery(code){ showModal(`<h3>Votre code de récupération</h3>
-  <div class="msub">Il permet de réinitialiser votre mot de passe en cas d'oubli, sans administrateur.</div>
-  <div style="font-family:var(--mono);font-size:22px;font-weight:700;letter-spacing:3px;text-align:center;padding:16px;border:1px dashed var(--line-2);border-radius:var(--r);margin:6px 0;color:var(--ink)">${esc(code)}</div>
-  <div class="note">Notez-le hors de l'appareil (carnet, gestionnaire de mots de passe). Ce code remplace tout code précédent.</div>
-  <button class="btn" style="margin-top:12px" onclick="closeModal()">J'ai noté le code</button>`); }
-function openRecovery(){ showModal(`<h3>Code de récupération</h3>
-  <div class="msub">Générez un code à conserver pour réinitialiser votre mot de passe en cas d'oubli.</div>
-  <label>Mot de passe actuel</label><input id="rcPwd" type="password" class="fld">
-  <div class="btn-row"><button class="btn" onclick="genRecovery()">Générer un nouveau code</button></div>
+/* ----- lien public de consultation ----- */
+const PAGES_VIEWER="https://lejourdain.github.io/permanances/viewer.html";
+const shareLink=tok=>PAGES_VIEWER+"?t="+tok;
+function showShareModal(url){ showModal(`<h3>Lien de consultation</h3>
+  <div class="msub">Lecture seule. Toute personne disposant du lien peut consulter le planning (sans nom/prénom ni identifiants).</div>
+  <input class="fld" readonly value="${esc(url)}" onclick="this.select()" style="font-family:var(--mono);font-size:12px">
+  <div class="btn-row"><button class="btn" onclick="(navigator.clipboard&&navigator.clipboard.writeText('${esc(url)}'));toast('Lien copié')">Copier le lien</button></div>
+  <div class="note">Nécessite d'avoir activé GitHub Pages et ajouté <b>viewer.html</b> (voir notice). « Désactiver » révoque le lien immédiatement.</div>
   <button class="btn sec" style="margin-top:9px;width:100%" onclick="closeModal()">Fermer</button>`); }
-async function genRecovery(){ const pw=$("#rcPwd").value; if(!sb){ toast("Connexion requise"); return; }
-  try{ const {data,error}=await sb.rpc("auth_generate_recovery",{p_pseudo:session.pseudo,p_password:pw}); if(error) throw error; showRecovery(data);
-  }catch(e){ toast("Mot de passe actuel incorrect"); } }
-function openForgot(){ showModal(`<h3>Réinitialiser le mot de passe</h3>
-  <div class="msub">Avec le code de récupération fourni à la création du compte.</div>
-  <label>Identifiant</label><input id="fgPseudo" class="fld" autocomplete="username">
-  <label>Code de récupération</label><input id="fgCode" class="fld" placeholder="ex : 682FE07DDB70">
-  <label>Nouveau mot de passe</label><input id="fgPwd" type="password" class="fld" placeholder="4 caractères min.">
-  <div class="btn-row"><button class="btn" onclick="doForgot()">Réinitialiser</button></div>
-  <button class="btn sec" style="margin-top:9px;width:100%" onclick="closeModal()">Annuler</button>`); }
-async function doForgot(){ const p=$("#fgPseudo").value.trim(),c=$("#fgCode").value.trim(),n=$("#fgPwd").value;
-  if(!p||!c||n.length<4){ toast("Champs requis (mot de passe 4 car. min.)"); return; }
-  if(!cloudReady()){ toast("Base injoignable"); return; } makeClient();
-  try{ const {data,error}=await sb.rpc("auth_reset_with_code",{p_pseudo:p,p_code:c,p_new:n}); if(error) throw error;
-    if(data==="ok"){ closeModal(); toast("Mot de passe réinitialisé — connectez-vous"); }
-    else if(data==="nocode"){ toast("Aucun code de récupération pour ce compte"); }
-    else toast("Code de récupération incorrect");
-  }catch(e){ toast("Échec (réseau ?)"); } }
+async function shareGenerate(){ if(!sb){ toast("Connexion requise"); return; }
+  try{ const {data,error}=await sb.rpc("share_set",{p_enable:true}); if(error) throw error; showShareModal(shareLink(data));
+  }catch(e){ toast("Action réservée à l'administrateur"); } }
+async function shareShow(){ if(!sb){ toast("Connexion requise"); return; }
+  try{ const {data,error}=await sb.rpc("share_get"); if(error) throw error;
+    if(data) showShareModal(shareLink(data)); else toast("Aucun lien actif — générez-en un");
+  }catch(e){ toast("Échec (droits ?)"); } }
+async function shareDisable(){ if(!sb){ toast("Connexion requise"); return; }
+  try{ const {error}=await sb.rpc("share_set",{p_enable:false}); if(error) throw error; toast("Lien désactivé");
+  }catch(e){ toast("Échec (droits ?)"); } }
 
-/* ----- compte : changer son mot de passe ----- */
+/* ----- compte : changer son mot de passe (Supabase Auth) ----- */
 function openChangePwd(){ showModal(`<h3>Changer mon mot de passe</h3>
-  <label>Mot de passe actuel</label><input id="cpOld" type="password" class="fld">
-  <label>Nouveau mot de passe</label><input id="cpNew" type="password" class="fld" placeholder="4 caractères min.">
+  <div class="msub">Vous êtes déjà connecté ; saisissez simplement le nouveau.</div>
+  <label>Nouveau mot de passe</label><input id="cpNew" type="password" class="fld" placeholder="6 caractères min.">
   <div class="btn-row"><button class="btn" onclick="changePwd()">Valider</button></div>
   <button class="btn sec" style="margin-top:9px;width:100%" onclick="closeModal()">Annuler</button>`); }
-async function changePwd(){ const o=$("#cpOld").value,n=$("#cpNew").value;
-  if(n.length<4){ toast("Nouveau mot de passe trop court"); return; }
+async function changePwd(){ const n=$("#cpNew").value;
+  if(n.length<6){ toast("6 caractères minimum"); return; }
   if(!sb){ toast("Connexion requise"); return; }
-  try{ const {error}=await sb.rpc("auth_set_password",{p_pseudo:session.pseudo,p_old:o,p_new:n}); if(error) throw error;
-    session.password=n; Store.set("permSession",JSON.stringify(session)); closeModal(); toast("Mot de passe modifié");
-  }catch(e){ toast("Mot de passe actuel incorrect"); } }
+  try{ const {error}=await sb.auth.updateUser({password:n}); if(error) throw error; closeModal(); toast("Mot de passe modifié");
+  }catch(e){ toast("Échec : "+((e&&e.message)||"réessayez")); } }
+
+/* ----- compte : modifier son pseudo ----- */
+function openPseudo(){ showModal(`<h3>Mon pseudo / trigramme affiché</h3>
+  <label>Pseudo</label><input id="psNew" class="fld" value="${esc(session.pseudo)}">
+  <div class="btn-row"><button class="btn" onclick="savePseudo()">Enregistrer</button></div>
+  <button class="btn sec" style="margin-top:9px;width:100%" onclick="closeModal()">Annuler</button>`); }
+async function savePseudo(){ const v=$("#psNew").value.trim(); if(!v){ toast("Pseudo requis"); return; }
+  try{ const {error}=await sb.rpc("set_my_pseudo",{p_pseudo:v}); if(error) throw error;
+    session.pseudo=v; $("#hdrUser").textContent=v; closeModal(); toast("Pseudo mis à jour"); if(tab==="params") renderParams();
+  }catch(e){ toast("Échec (réseau ?)"); } }
 
 /* ----- admin : comptes & rôles ----- */
 async function loadUsers(){ if(!sb){ toast("Connexion requise"); return; }
   const el=$("#usersList"); el.innerHTML="Chargement…";
-  try{ const {data,error}=await sb.rpc("admin_list_users",{p_admin:session.pseudo,p_password:session.password}); if(error) throw error;
-    el.innerHTML=(data||[]).map(u=>`<div class="item" style="padding:10px 12px"><div class="meta"><div class="nm">${esc(u.pseudo)}</div></div>
+  try{ const {data,error}=await sb.rpc("admin_list_users"); if(error) throw error;
+    el.innerHTML=(data||[]).map(u=>`<div class="item" style="padding:10px 12px"><div class="meta"><div class="nm">${esc(u.pseudo||u.email)}</div><div class="det">${esc(u.email)}</div></div>
       <span class="rolepill ${u.role}">${u.role==="admin"?"Admin":"Utilisateur"}</span>
-      <button class="btn sec sm" onclick="toggleRole('${esc(u.pseudo)}','${u.role}')">${u.role==="admin"?"↓ User":"↑ Admin"}</button>
-      <button class="btn sec sm" onclick="resetPwd('${esc(u.pseudo)}')">Réinit. MDP</button></div>`).join("")||"Aucun compte.";
+      <button class="btn sec sm" onclick="toggleRole('${u.id}','${u.role}')">${u.role==="admin"?"↓ User":"↑ Admin"}</button></div>`).join("")||"Aucun compte.";
   }catch(e){ el.innerHTML=`<div class="note">Action réservée à l'administrateur.</div>`; } }
-async function toggleRole(pseudo,role){ const nr=role==="admin"?"user":"admin";
-  try{ const {error}=await sb.rpc("admin_set_role",{p_admin:session.pseudo,p_password:session.password,p_target:pseudo,p_role:nr}); if(error) throw error;
-    toast("Rôle mis à jour"); loadUsers();
+async function toggleRole(id,role){ const nr=role==="admin"?"user":"admin";
+  try{ const {error}=await sb.rpc("admin_set_role",{p_target:id,p_role:nr}); if(error) throw error; toast("Rôle mis à jour"); loadUsers();
   }catch(e){ toast(/DERNIER_ADMIN/.test((e.message||"")+(e.code||""))?"Impossible : dernier administrateur":"Échec (droits ?)"); } }
-async function resetPwd(pseudo){ const np=prompt("Nouveau mot de passe pour « "+pseudo+" » (4 car. min.) :"); if(!np) return;
-  if(np.length<4){ toast("Trop court"); return; }
-  try{ const {error}=await sb.rpc("admin_reset_password",{p_admin:session.pseudo,p_password:session.password,p_target:pseudo,p_newpw:np}); if(error) throw error;
-    toast("Mot de passe réinitialisé");
-  }catch(e){ toast("Échec (droits ?)"); } }
 
 /* ===== EXPORTS / PARTAGE ===== */
 function dl(name,content,mime){ const b=new Blob(["\ufeff"+content],{type:mime}),u=URL.createObjectURL(b),a=document.createElement("a");
@@ -821,7 +844,7 @@ function bindChips(sel){ document.querySelectorAll(sel+" .chip").forEach(c=>c.on
 
 /* ===== Init ===== */
 applyTheme();
-(function init(){ relogin(); })();
+(async function init(){ await restoreSession(); })();
 if("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(()=>{});
 </script>
 </body>
