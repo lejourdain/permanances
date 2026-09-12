@@ -14,6 +14,7 @@
   --slate:#1b2533; --slate-2:#283549;
   --accent:#2f5277; --accent-2:#264362; --accent-soft:#e7edf3; --accent-ink:#24405f;
   --danger:#b23b3b; --danger-soft:#f7ebeb; --ok:#2f7d57; --warn:#c47a1c;
+  --purple:#6d4bb0; --purple-soft:#ece5f8;
   --r:4px; --r-sm:3px;
   --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
   --mono:ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
@@ -25,6 +26,7 @@ body.dark{
   --slate:#0b1016; --slate-2:#18212e;
   --accent:#5a86c8; --accent-2:#6f99d6; --accent-soft:#1b2a3e; --accent-ink:#a9c4ea;
   --danger:#e07070; --danger-soft:#3a2323; --ok:#46b07e; --warn:#d2933c;
+  --purple:#9b7fe0; --purple-soft:#2a2240;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;min-height:100%}
@@ -37,7 +39,6 @@ input,select,textarea{font-family:inherit}
 .tnum{font-variant-numeric:tabular-nums}
 svg{display:block}
 
-/* header */
 header.app{position:sticky;top:0;z-index:30;background:var(--slate);color:#eef1f5;
   padding:max(12px,env(safe-area-inset-top)) 14px 12px}
 header.app .row{display:flex;align-items:center;gap:10px;max-width:900px;margin:0 auto}
@@ -60,7 +61,6 @@ header.app .row{display:flex;align-items:center;gap:10px;max-width:900px;margin:
 .logout{font-size:11px;color:#93a1b8;border:1px solid #ffffff26;border-radius:var(--r-sm);padding:6px 8px}
 .logout:hover{background:#ffffff14;color:#fff}
 
-/* layout */
 main{max-width:900px;margin:0 auto;padding:16px 14px 6px}
 .screen{animation:fade .2s ease}
 @keyframes fade{from{opacity:0}to{opacity:1}}
@@ -69,11 +69,9 @@ main{max-width:900px;margin:0 auto;padding:16px 14px 6px}
 .screen-h h2{font-size:19px;font-weight:600}
 .screen-h .sub{color:var(--ink-2);font-size:12px;margin-top:3px}
 
-/* cards */
 .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:15px;margin-bottom:13px}
 .card h3{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3);margin-bottom:13px;font-weight:700}
 
-/* forms */
 label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-2);font-weight:600;margin:13px 0 5px}
 .fld{width:100%;background:var(--surface);border:1px solid var(--line-2);color:var(--ink);border-radius:var(--r-sm);
   padding:10px 11px;font-size:14.5px;transition:border-color .12s,box-shadow .12s}
@@ -82,7 +80,6 @@ label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.04em
 textarea.fld{min-height:74px;resize:vertical}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 
-/* buttons */
 .btn{background:var(--accent);color:#fff;border-radius:var(--r-sm);padding:11px 15px;font-weight:600;
   font-size:14px;width:100%;transition:background .12s,transform .04s;border:1px solid var(--accent)}
 .btn:hover{background:var(--accent-2);border-color:var(--accent-2)}
@@ -97,7 +94,6 @@ textarea.fld{min-height:74px;resize:vertical}
   padding:8px 13px;font-size:13px;font-weight:600;white-space:nowrap}
 .act:hover{background:var(--accent-2)}
 
-/* list items */
 .item{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:11px 13px;
   margin-bottom:8px;display:flex;align-items:center;gap:12px;transition:border-color .12s}
 .item:hover{border-color:var(--line-strong)}
@@ -115,13 +111,11 @@ textarea.fld{min-height:74px;resize:vertical}
 .empty .ic{margin:0 auto 12px;color:var(--ink-3)}
 .empty .sm{font-size:12px;color:var(--ink-3);margin-top:5px}
 
-/* segmented */
 .seg{display:inline-flex;border:1px solid var(--line-2);border-radius:var(--r-sm);overflow:hidden;margin-bottom:15px}
 .seg button{padding:8px 16px;font-size:13px;font-weight:600;color:var(--ink-2);background:var(--surface);border-right:1px solid var(--line-2)}
 .seg button:last-child{border-right:none}
 .seg button.on{background:var(--accent);color:#fff}
 
-/* calendar */
 .calbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:13px;gap:8px}
 .calbar .mlabel{font-size:16px;font-weight:600;text-transform:capitalize}
 .navbtn{width:34px;height:34px;border:1px solid var(--line-2);background:var(--surface);color:var(--ink);
@@ -145,7 +139,6 @@ textarea.fld{min-height:74px;resize:vertical}
 .legend span{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--ink-2)}
 .legend i{width:11px;height:11px;border-radius:2px;flex:0 0 auto}
 
-/* day detail */
 .dayblock{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:13px;margin-bottom:11px}
 .dayblock .dh{display:flex;align-items:center;justify-content:space-between;margin-bottom:11px;gap:8px}
 .dayblock .dt{font-size:15px;font-weight:600;text-transform:capitalize}
@@ -163,20 +156,17 @@ textarea.fld{min-height:74px;resize:vertical}
 .mline{font-size:12.5px;margin:5px 0;color:var(--ink);cursor:pointer}.mline:hover{color:var(--accent-ink)}
 .mline b{font-weight:600}
 
-/* chips */
 .agpick{display:flex;flex-wrap:wrap;gap:7px;margin-top:5px}
 .chip{border:1px solid var(--line-2);border-radius:var(--r-sm);padding:7px 11px;font-size:12.5px;font-weight:600;background:var(--surface);color:var(--ink-2)}
 .chip.on{background:var(--slate);color:#fff;border-color:var(--slate)}
 body.dark .chip.on{background:var(--accent);border-color:var(--accent)}
 
-/* color settings */
 .crow{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
 .crow:last-child{border-bottom:none}
 .crow .sw{width:40px;height:40px;border-radius:var(--r-sm);display:grid;place-items:center;color:#fff;font-weight:700;font-size:11px}
 .crow .lab{flex:1}.crow .lab .nm{font-weight:600;font-size:14px}.crow .lab .hex{font-size:11px;color:var(--ink-3);font-family:var(--mono)}
 input[type=color]{width:46px;height:38px;padding:2px;border:1px solid var(--line-2);border-radius:var(--r-sm);background:var(--surface);cursor:pointer}
 
-/* toggle */
 .switch{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .switch .lab{font-weight:600;font-size:14px}
 .tog{width:46px;height:26px;border-radius:99px;background:var(--line-2);position:relative;transition:background .15s;flex:0 0 auto}
@@ -184,7 +174,6 @@ input[type=color]{width:46px;height:38px;padding:2px;border:1px solid var(--line
 .tog::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .15s}
 .tog.on::after{left:23px}
 
-/* modal */
 .overlay{position:fixed;inset:0;background:rgba(15,20,30,.5);z-index:50;display:flex;align-items:flex-end;justify-content:center;animation:fade .15s}
 .modal{background:var(--surface);border-radius:var(--r) var(--r) 0 0;width:100%;max-width:560px;max-height:92vh;
   overflow:auto;padding:6px 16px calc(22px + env(safe-area-inset-bottom));border-top:1px solid var(--line)}
@@ -193,7 +182,6 @@ input[type=color]{width:46px;height:38px;padding:2px;border:1px solid var(--line
 .modal h3{font-size:17px;font-weight:600}
 .modal .msub{color:var(--ink-2);font-size:12.5px;margin:3px 0 5px}
 
-/* notifications */
 .notif{display:flex;gap:10px;padding:11px 0;border-bottom:1px solid var(--line)}
 .notif:last-child{border-bottom:none}
 .notif .ndot{width:8px;height:8px;border-radius:50%;background:var(--accent);margin-top:5px;flex:0 0 auto}
@@ -201,20 +189,17 @@ input[type=color]{width:46px;height:38px;padding:2px;border:1px solid var(--line
 .notif .nt{font-size:13.5px}
 .notif .nm2{font-size:11px;color:var(--ink-3);margin-top:2px}
 
-/* nav */
 nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:40;display:flex;background:var(--surface);border-top:1px solid var(--line-2);padding-bottom:env(safe-area-inset-bottom)}
 nav.tabs .tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;font-weight:600;
   color:var(--ink-3);padding:9px 2px 8px;border-top:2px solid transparent;text-transform:uppercase;letter-spacing:.03em}
 nav.tabs .tab svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.7}
 nav.tabs .tab.on{color:var(--accent);border-top-color:var(--accent)}
 
-/* toast */
 .toast{position:fixed;left:50%;bottom:100px;transform:translateX(-50%);background:var(--slate);color:#fff;
   padding:10px 18px;border-radius:var(--r-sm);font-size:13px;z-index:80;box-shadow:0 6px 20px rgba(0,0,0,.35)}
 .note{font-size:11.5px;color:var(--ink-3);margin-top:8px;line-height:1.55}
 .tablebar{display:flex;gap:8px;flex-wrap:wrap}
 
-/* login */
 .login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
 .login-card{width:100%;max-width:360px}
 .login .top{text-align:center;margin-bottom:24px}
@@ -229,6 +214,41 @@ details.cfg{margin-top:14px;border-top:1px solid var(--line);padding-top:6px}
 details.cfg summary{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-3);font-weight:600;cursor:pointer;list-style:none;padding:6px 0}
 details.cfg summary::-webkit-details-marker{display:none}
 .login .foot{text-align:center;font-size:11px;color:var(--ink-3);margin-top:16px;line-height:1.5}
+
+/* ===== MULTI-PLANNING SELECTOR ===== */
+.plan-sel{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.plan-sel select{flex:1;min-width:140px;background:var(--surface);border:1px solid var(--line-2);color:var(--ink);
+  border-radius:var(--r-sm);padding:9px 32px 9px 11px;font-size:14px;font-weight:600;font-family:inherit;
+  appearance:none;cursor:pointer;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238a929d' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 10px center}
+.plan-sel select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+.plan-type-badge{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:4px 9px;border-radius:99px}
+.plan-type-badge.standard{background:var(--accent-soft);color:var(--accent-ink)}
+.plan-type-badge.cyclique{background:var(--purple-soft);color:var(--purple)}
+
+/* cyclic calendar day colors */
+.day.grp-a{background:var(--accent-soft)}
+.day.grp-b{background:var(--purple-soft)}
+.day.grp-a.today{box-shadow:inset 0 0 0 1px var(--accent)}
+.day.grp-b.today{box-shadow:inset 0 0 0 1px var(--purple)}
+.cyc-legend{display:flex;gap:14px;margin-bottom:13px;font-size:12px;color:var(--ink-2)}
+.cyc-legend span{display:flex;align-items:center;gap:6px}
+.cyc-sw{width:14px;height:14px;border-radius:3px;flex:0 0 auto}
+
+/* group section for cyclic config */
+.grp-section{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin-bottom:11px}
+.grp-section .grp-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.grp-section .grp-head .grp-dot{width:12px;height:12px;border-radius:3px;flex:0 0 auto}
+.grp-section .grp-head .grp-title{font-size:14px;font-weight:700}
+.member-chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
+.member-chip{display:inline-flex;align-items:center;gap:4px;background:var(--surface-2);border:1px solid var(--line);
+  padding:4px 10px;border-radius:20px;font-size:12px;font-weight:600}
+.member-chip .mc-x{background:none;border:none;color:var(--ink-3);cursor:pointer;font-size:14px;padding:0 2px;line-height:1}
+.member-chip .mc-x:hover{color:var(--danger)}
+.add-row{display:flex;gap:6px}
+.add-row .fld{flex:1;padding:7px 10px;font-size:13px}
+.add-row .btn{width:auto;padding:7px 14px;font-size:13px}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -328,7 +348,10 @@ function defaultDB(){ return {
   serviceName:"Service",
   colors:Object.fromEntries(Object.entries(TYPES).map(([k,v])=>[k,v.color])),
   slots:{permanence:{debut:"08:00",fin:"18:00",nb:1},astreinte:{debut:"18:00",fin:"08:00",nb:1}},
-  agents:[],events:[],missionTypes:[...DEFAULT_MISSION_TYPES],missions:[],vehicles:[],materiel:[],activity:[],lastEditBy:"" }; }
+  agents:[],events:[],missionTypes:[...DEFAULT_MISSION_TYPES],missions:[],vehicles:[],materiel:[],activity:[],lastEditBy:"",
+  /* ===== MULTI-PLANNING ===== */
+  plannings:[],
+  activePlanningId:"" }; }
 let DB=defaultDB();
 
 let tab="planning",planMode="mois",cursor=new Date();
@@ -348,6 +371,37 @@ function cacheKey(){ return "permApp:shared"; }
 function saveLocal(){ Store.set(cacheKey(),JSON.stringify({data:DB,ts:lastSync})); }
 function loadLocal(){ const r=Store.get(cacheKey()); if(r){ try{ const o=JSON.parse(r); DB=Object.assign(defaultDB(),o.data); lastSync=o.ts||0; return true; }catch(e){} } return false; }
 function syncState(cls,txt){ const b=document.getElementById("syncBox"); if(!b)return; b.className="sync "+cls; document.getElementById("syncTxt").textContent=txt; }
+
+/* ===== MULTI-PLANNING : migration & helpers ===== */
+function migratePlannings(){
+  if(!DB.plannings) DB.plannings=[];
+  // Si aucun planning et des données existantes → créer un planning par défaut
+  if(DB.plannings.length===0){
+    const hasData = (DB.events&&DB.events.length>0) || (DB.agents&&DB.agents.length>0);
+    DB.plannings.push({
+      id:"default",
+      name: hasData ? (DB.serviceName||"Planning principal") : "Planning principal",
+      type:"standard",
+      slots: DB.slots ? JSON.parse(JSON.stringify(DB.slots)) : {permanence:{debut:"08:00",fin:"18:00",nb:1},astreinte:{debut:"18:00",fin:"08:00",nb:1}},
+      events: DB.events ? [...DB.events] : []
+    });
+    DB.activePlanningId="default";
+  }
+  if(!DB.activePlanningId && DB.plannings.length) DB.activePlanningId=DB.plannings[0].id;
+  // S'assurer que chaque planning a les bons champs
+  DB.plannings.forEach(p=>{
+    if(p.type==="standard"){
+      if(!p.slots) p.slots={permanence:{debut:"08:00",fin:"18:00",nb:1},astreinte:{debut:"18:00",fin:"08:00",nb:1}};
+      if(!p.events) p.events=[];
+    } else if(p.type==="cyclique"){
+      if(!p.cycleStart) p.cycleStart=ymd(new Date());
+      if(!p.cycleDays) p.cycleDays=7;
+      if(!p.groups) p.groups={A:{name:"Groupe A",members:[]},B:{name:"Groupe B",members:[]}};
+    }
+  });
+}
+function activePlanning(){ return DB.plannings.find(p=>p.id===DB.activePlanningId) || DB.plannings[0] || null; }
+function setActivePlanning(id){ DB.activePlanningId=id; save(); renderPlanning(); }
 
 /* ===== Thème ===== */
 function applyTheme(){ const d=Store.get("permTheme")==="dark"; document.body.classList.toggle("dark",d);
@@ -374,10 +428,11 @@ function toast(m){const t=document.createElement("div");t.className="toast";t.te
 const agentById=id=>DB.agents.find(a=>a.id===id);
 const triOf=id=>(agentById(id)||{}).trigramme||"???";
 const colorOf=t=>DB.colors[t]||"#888";
-const eventsOn=ds=>DB.events.filter(e=>e.date===ds);
+/* Events & missions use active planning for events, global for missions */
+const eventsOn=ds=>{ const p=activePlanning(); return p&&p.type==="standard"?(p.events||[]).filter(e=>e.date===ds):[]; };
 const missionsOn=ds=>DB.missions.filter(m=>m.date===ds);
 
-/* ===== Connexion (Supabase Auth — e-mail) ===== */
+/* ===== Connexion (Supabase Auth) ===== */
 function loginMsg(t,err){ const e=$("#liMsg"); if(e){ e.textContent=t||""; e.className="msg"+(err?" err":""); } }
 function applyCfgFields(){ const cu=$("#liUrl"), ck=$("#liKey");
   if(cu&&(cu.value.trim()||ck.value.trim())){ Store.set("permCfg",JSON.stringify({url:cu.value.trim(),key:ck.value.trim()})); sb=null; } }
@@ -396,8 +451,8 @@ async function pullData(){
        if(error) throw error;
        if(data){ DB=Object.assign(defaultDB(),data.data||{}); lastSync=new Date(data.updated_at).getTime(); }
        else { DB=defaultDB(); lastSync=Date.now(); }
-       saveLocal();
-  }catch(e){ if(!loadLocal()){ DB=defaultDB(); } }
+       migratePlannings(); saveLocal();
+  }catch(e){ if(!loadLocal()){ DB=defaultDB(); } migratePlannings(); }
 }
 async function doLogin(){
   const email=$("#liEmail").value.trim(), pwd=$("#liPwd").value;
@@ -442,6 +497,7 @@ function openForgot(){ showModal(`<h3>Réinitialiser le mot de passe</h3>
   <button class="btn sec" style="margin-top:9px;width:100%" onclick="closeModal()">Annuler</button>`); }
 
 function enterApp(){
+  migratePlannings();
   $("#login").classList.add("hidden"); $("#app").classList.remove("hidden");
   $("#hdrSub").textContent=DB.serviceName||"Service";
   $("#hdrUser").textContent=session.pseudo;
@@ -464,6 +520,9 @@ async function restoreSession(){
 }
 async function pushNow(){
   if(!sb||applying) return;
+  // Synchroniser events du planning actif vers le champ legacy pour la compat viewer
+  const ap=activePlanning();
+  if(ap&&ap.type==="standard"){ DB.events=ap.events||[]; DB.slots=ap.slots||DB.slots; }
   try{ const {error}=await sb.from("services").upsert({code:"shared-service-main",data:DB});
     if(error) throw error; lastSync=Date.now(); syncState("ok","synchronisé");
   }catch(e){ syncState("off","hors-ligne"); }
@@ -476,7 +535,7 @@ async function poll(){
     if(error) throw error;
     if(data){ const t=new Date(data.updated_at).getTime();
       if(t>lastSync+500){ const r=await sb.from("services").select("data,updated_at").eq("code","shared-service-main").maybeSingle();
-        if(!r.error&&r.data){ applying=true; DB=Object.assign(defaultDB(),r.data.data||{}); lastSync=t; saveLocal(); applying=false; rerender(); updateBadge(); syncState("ok","mis à jour"); } } }
+        if(!r.error&&r.data){ applying=true; DB=Object.assign(defaultDB(),r.data.data||{}); migratePlannings(); lastSync=t; saveLocal(); applying=false; rerender(); updateBadge(); syncState("ok","mis à jour"); } } }
   }catch(e){ syncState("off","hors-ligne"); }
 }
 function rerender(){ ({planning:renderPlanning,missions:renderMissions,effectifs:renderEffectifs,ressources:renderRessources,params:renderParams}[tab]||(()=>{}))(); }
@@ -515,18 +574,56 @@ function screenHead(title,sub,label,fn){
     ${label?`<button class="act" onclick="${fn}">${label}</button>`:""}</div>`;
 }
 
-/* ===== PLANNING ===== */
-function renderPlanning(){
-  $("#view-planning").innerHTML=
-    screenHead("Planning",esc(DB.serviceName), isAdmin()?"+ Événement":"", `openEventModal(null,'${ymd(cursor)}')`)+
-    `<div class="seg" id="planSeg">
-      <button data-m="mois" class="${planMode==="mois"?"on":""}">Mois</button>
-      <button data-m="semaine" class="${planMode==="semaine"?"on":""}">Semaine</button>
-      <button data-m="jour" class="${planMode==="jour"?"on":""}">Jour</button>
-    </div><div id="planBody"></div>`;
-  $("#planSeg").querySelectorAll("button").forEach(b=>b.onclick=()=>{planMode=b.dataset.m;renderPlanning();});
-  if(planMode==="mois") renderMonth(); else if(planMode==="semaine") renderWeek(); else renderDay();
+/* ===== PLANNING (MULTI) ===== */
+function planSelector(){
+  if(DB.plannings.length<=1 && !isAdmin()) return "";
+  const opts=DB.plannings.map(p=>`<option value="${p.id}" ${p.id===DB.activePlanningId?"selected":""}>${esc(p.name)}</option>`).join("");
+  const ap=activePlanning();
+  const typeBadge=ap?`<span class="plan-type-badge ${ap.type}">${ap.type==="standard"?"Perm / Astreinte":"Cyclique"}</span>`:"";
+  return `<div class="plan-sel">
+    <select onchange="setActivePlanning(this.value)">${opts}</select>
+    ${typeBadge}
+    ${isAdmin()?`<button class="btn sec sm" onclick="openNewPlanningModal()">+ Planning</button>
+    <button class="btn sec sm" onclick="openManagePlanningModal()">⚙</button>`:""}
+  </div>`;
 }
+
+function renderPlanning(){
+  const ap=activePlanning();
+  if(!ap){ $("#view-planning").innerHTML=screenHead("Planning",esc(DB.serviceName),"+ Planning","openNewPlanningModal()")+
+    `<div class="empty"><svg class="ic" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3" y="4" width="18" height="17" rx="1"/><path d="M3 9h18"/></svg>Aucun planning créé.<div class="sm">Créez un premier planning pour commencer.</div></div>`;
+    return; }
+
+  const addEvtBtn = ap.type==="standard" && isAdmin() ? `openEventModal(null,'${ymd(cursor)}')` : "";
+  $("#view-planning").innerHTML=
+    screenHead("Planning",esc(DB.serviceName), ap.type==="standard"&&isAdmin()?"+ Événement":"", addEvtBtn)+
+    planSelector()+
+    (ap.type==="standard" ? renderStandardControls() : renderCyclicControls())+
+    `<div id="planBody"></div>`;
+
+  if(ap.type==="standard"){
+    $("#planSeg").querySelectorAll("button").forEach(b=>b.onclick=()=>{planMode=b.dataset.m;renderPlanning();});
+    if(planMode==="mois") renderMonth(); else if(planMode==="semaine") renderWeek(); else renderDay();
+  } else {
+    renderCyclicMonth();
+  }
+}
+
+function renderStandardControls(){
+  return `<div class="seg" id="planSeg">
+    <button data-m="mois" class="${planMode==="mois"?"on":""}">Mois</button>
+    <button data-m="semaine" class="${planMode==="semaine"?"on":""}">Semaine</button>
+    <button data-m="jour" class="${planMode==="jour"?"on":""}">Jour</button>
+  </div>`;
+}
+
+function renderCyclicControls(){
+  const ap=activePlanning();
+  return `${isAdmin()?`<div class="tablebar" style="margin-bottom:13px">
+    <button class="btn sec sm" onclick="openCyclicConfig()">⚙ Configuration du cycle</button>
+  </div>`:""}`; 
+}
+
 function calBar(label,unit){
   return `<div class="calbar"><button class="navbtn" onclick="shift('${unit}',-1)">‹</button>
     <div class="mlabel tnum">${label}</div>
@@ -536,7 +633,10 @@ function calBar(label,unit){
 function shift(u,n){ if(u==="mois")cursor=new Date(cursor.getFullYear(),cursor.getMonth()+n,1);
   if(u==="semaine")cursor=addDays(cursor,7*n); if(u==="jour")cursor=addDays(cursor,n); renderPlanning(); }
 function goToday(){ cursor=new Date(); renderPlanning(); }
+
+/* --- Standard calendar (unchanged logic) --- */
 function renderMonth(){
+  const ap=activePlanning(); if(!ap||ap.type!=="standard") return;
   const y=cursor.getFullYear(),m=cursor.getMonth(),start=startOfWeek(new Date(y,m,1));
   let h=calBar(`${MOIS[m]} ${y}`,"mois")+`<div class="cal">`+JOURS.map(j=>`<div class="dow">${j}</div>`).join("");
   for(let i=0;i<42;i++){ const d=addDays(start,i),ds=ymd(d),inM=d.getMonth()===m,evs=eventsOn(ds);
@@ -554,14 +654,17 @@ function renderWeek(){ const s=startOfWeek(cursor),e=addDays(s,6);
   const lbl=`${s.getDate()} ${MOIS[s.getMonth()].slice(0,4)}. – ${e.getDate()} ${MOIS[e.getMonth()].slice(0,4)}. ${e.getFullYear()}`;
   let h=calBar(lbl,"semaine"); for(let i=0;i<7;i++) h+=dayBlock(addDays(s,i)); $("#planBody").innerHTML=h; }
 function renderDay(){ $("#planBody").innerHTML=calBar(`${fmtLong(cursor)} ${cursor.getFullYear()}`,"jour")+dayBlock(cursor); }
+
 function dayBlock(d){
+  const ap=activePlanning(); if(!ap) return "";
   const ds=ymd(d),evs=eventsOn(ds),byType=t=>evs.filter(e=>e.type===t),adm=isAdmin();
   const tagsFor=arr=>arr.length?`<div class="tris">`+arr.flatMap(e=>e.agentIds.map(id=>
       `<span class="tag ${adm?"ed":""}" style="background:${colorOf(e.type)}" ${adm?`onclick="event.stopPropagation();openEventModal('${e.id}')"`:""}>${esc(triOf(id))}</span>`)).join("")+`</div>`
     :`<span class="nofill">— personne —</span>`;
   const perm=byType("permanence"),astr=byType("astreinte"),absEvs=evs.filter(e=>ABS_TYPES.includes(e.type)),miss=missionsOn(ds);
+  const slots=ap.slots||DB.slots;
   const cntPerm=perm.reduce((n,e)=>n+e.agentIds.length,0), cntAstr=astr.reduce((n,e)=>n+e.agentIds.length,0);
-  const reqPerm=(DB.slots.permanence||{}).nb||0, reqAstr=(DB.slots.astreinte||{}).nb||0;
+  const reqPerm=(slots.permanence||{}).nb||0, reqAstr=(slots.astreinte||{}).nb||0;
   const fill=(c,r)=>r>0?`<span style="margin-left:8px;font-size:10px;font-weight:700;padding:1px 7px;border-radius:99px;letter-spacing:0;${c<r?"background:var(--danger-soft);color:var(--danger)":"background:var(--accent-soft);color:var(--ok)"}">${c}/${r}${c<r?" · non pourvu":""}</span>`:"";
   const todayTag=isToday(d)?"<small>aujourd'hui</small>":"";
   let absBlk=""; if(absEvs.length){ absBlk=`<div class="slot"><div class="sh"><span class="cdot" style="background:${colorOf("absence")}"></span>Absences & statuts</div><div class="tris">`+
@@ -570,15 +673,195 @@ function dayBlock(d){
     miss.map(x=>`<div class="mline" onclick="event.stopPropagation();openMissionModal('${x.id}')">• <b>${esc(x.type)}</b> ${x.debut?esc(x.debut):""}${x.lieu?" · "+esc(x.lieu):""}${x.agentIds.length?" · "+x.agentIds.map(triOf).join(","):""}</div>`).join("")+`</div>`; }
   return `<div class="dayblock"><div class="dh"><div class="dt">${fmtLong(d)}${todayTag}</div>
     ${adm?`<button class="btn sec sm" onclick="openEventModal(null,'${ds}')">+ Événement</button>`:""}</div>
-    <div class="slot"><div class="sh"><span class="cdot" style="background:${colorOf("permanence")}"></span>Permanence${fill(cntPerm,reqPerm)}<span class="time tnum">${esc(DB.slots.permanence.debut)}–${esc(DB.slots.permanence.fin)}</span></div>${tagsFor(perm)}</div>
-    <div class="slot"><div class="sh"><span class="cdot" style="background:${colorOf("astreinte")}"></span>Astreinte${fill(cntAstr,reqAstr)}<span class="time tnum">${esc(DB.slots.astreinte.debut)}–${esc(DB.slots.astreinte.fin)}</span></div>${tagsFor(astr)}</div>
+    <div class="slot"><div class="sh"><span class="cdot" style="background:${colorOf("permanence")}"></span>Permanence${fill(cntPerm,reqPerm)}<span class="time tnum">${esc(slots.permanence.debut)}–${esc(slots.permanence.fin)}</span></div>${tagsFor(perm)}</div>
+    <div class="slot"><div class="sh"><span class="cdot" style="background:${colorOf("astreinte")}"></span>Astreinte${fill(cntAstr,reqAstr)}<span class="time tnum">${esc(slots.astreinte.debut)}–${esc(slots.astreinte.fin)}</span></div>${tagsFor(astr)}</div>
     ${absBlk}${missBlk}</div>`;
 }
 function openDay(ds){ cursor=parseYmd(ds); planMode="jour"; renderPlanning(); }
 
+/* --- Cyclic calendar --- */
+function getCyclicGroup(dateStr){
+  const ap=activePlanning(); if(!ap||ap.type!=="cyclique"||!ap.cycleStart) return null;
+  const start=new Date(ap.cycleStart), date=new Date(dateStr);
+  const diff=Math.floor((date-start)/86400000);
+  if(diff<0) return null;
+  const cycleLen=ap.cycleDays*2;
+  const pos=((diff%cycleLen)+cycleLen)%cycleLen;
+  return pos<ap.cycleDays?"A":"B";
+}
+
+function renderCyclicMonth(){
+  const ap=activePlanning(); if(!ap||ap.type!=="cyclique"){ $("#planBody").innerHTML=""; return; }
+  const y=cursor.getFullYear(),m=cursor.getMonth(),start=startOfWeek(new Date(y,m,1));
+  const grpA=ap.groups.A, grpB=ap.groups.B;
+  let h=calBar(`${MOIS[m]} ${y}`,"mois");
+  h+=`<div class="cyc-legend"><span><div class="cyc-sw" style="background:var(--accent)"></div>${esc(grpA.name)}</span>
+      <span><div class="cyc-sw" style="background:var(--purple)"></div>${esc(grpB.name)}</span></div>`;
+  h+=`<div class="cal">`+JOURS.map(j=>`<div class="dow">${j}</div>`).join("");
+  for(let i=0;i<42;i++){
+    const d=addDays(start,i),ds=ymd(d),inM=d.getMonth()===m;
+    const grp=getCyclicGroup(ds);
+    const cls=grp==="A"?"grp-a":grp==="B"?"grp-b":"";
+    const grpLabel=grp?`<div class="pill" style="background:${grp==="A"?"var(--accent)":"var(--purple)"};font-size:8px">${esc(grp==="A"?grpA.name:grpB.name)}</div>`:"";
+    h+=`<div class="day ${inM?"":"out"} ${isWE(d)?"we":""} ${isToday(d)?"today":""} ${cls}" onclick="openCyclicDay('${ds}')">
+      <div class="num tnum">${d.getDate()}</div>${grpLabel}</div>`;
+  }
+  h+=`</div>`;
+  h+=`<div class="note" style="margin-top:13px">Touchez une journée pour voir le groupe et les effectifs en service.</div>`;
+  $("#planBody").innerHTML=h;
+}
+
+function openCyclicDay(ds){
+  const ap=activePlanning(); if(!ap) return;
+  const grp=getCyclicGroup(ds);
+  if(!grp){ toast("Pas de rotation avant la date de début du cycle"); return; }
+  const g=ap.groups[grp];
+  const members=g.members.map(id=>{const a=agentById(id); return a?`${a.trigramme} · ${a.nom} ${a.prenom}`:"???";});
+  const color=grp==="A"?"var(--accent)":"var(--purple)";
+  showModal(`<h3>${fmtLong(parseYmd(ds))}</h3>
+    <div class="msub">Planning cyclique : <b>${esc(ap.name)}</b></div>
+    <div class="grp-section" style="margin-top:12px">
+      <div class="grp-head"><div class="grp-dot" style="background:${color}"></div><div class="grp-title">${esc(g.name)} en service</div></div>
+      ${members.length?`<div class="member-chips">${members.map(m=>`<span class="member-chip">${esc(m)}</span>`).join("")}</div>`
+        :`<span class="nofill">Aucun effectif assigné à ce groupe.</span>`}
+    </div>
+    <button class="btn sec" style="margin-top:12px;width:100%" onclick="closeModal()">Fermer</button>`);
+}
+
+/* --- Cyclic config modal --- */
+function openCyclicConfig(){
+  if(!isAdmin()) return;
+  const ap=activePlanning(); if(!ap||ap.type!=="cyclique") return;
+  const agChipsA=DB.agents.map(a=>{const on=ap.groups.A.members.includes(a.id);
+    return `<span class="chip ${on?"on":""}" data-id="${a.id}">${esc(a.trigramme)} · ${esc(a.nom)}</span>`;}).join("");
+  const agChipsB=DB.agents.map(a=>{const on=ap.groups.B.members.includes(a.id);
+    return `<span class="chip ${on?"on":""}" data-id="${a.id}">${esc(a.trigramme)} · ${esc(a.nom)}</span>`;}).join("");
+  const noAg=`<span class="nofill">Ajoutez d'abord des agents dans Effectifs.</span>`;
+  showModal(`<h3>Configuration du cycle</h3>
+    <div class="msub">Rotation entre deux groupes. Chaque groupe travaille N jours, puis l'autre prend le relais.</div>
+    <label>Date de début du cycle</label>
+    <input id="ccStart" type="date" class="fld" value="${ap.cycleStart}">
+    <label>Durée du cycle (jours par groupe)</label>
+    <input id="ccDays" type="number" min="1" max="60" class="fld" value="${ap.cycleDays}">
+    <label>Nom du groupe A</label>
+    <input id="ccNameA" class="fld" value="${esc(ap.groups.A.name)}">
+    <label>Effectifs groupe A</label>
+    <div class="agpick" id="ccGrpA">${DB.agents.length?agChipsA:noAg}</div>
+    <label>Nom du groupe B</label>
+    <input id="ccNameB" class="fld" value="${esc(ap.groups.B.name)}">
+    <label>Effectifs groupe B</label>
+    <div class="agpick" id="ccGrpB">${DB.agents.length?agChipsB:noAg}</div>
+    <div class="btn-row"><button class="btn" onclick="saveCyclicConfig()">Enregistrer</button></div>
+    <button class="btn sec" style="margin-top:9px;width:100%" onclick="closeModal()">Annuler</button>`);
+  bindChips("#ccGrpA"); bindChips("#ccGrpB");
+}
+
+function saveCyclicConfig(){
+  const ap=activePlanning(); if(!ap) return;
+  ap.cycleStart=$("#ccStart").value;
+  ap.cycleDays=Math.max(1,+$("#ccDays").value||7);
+  ap.groups.A.name=$("#ccNameA").value.trim()||"Groupe A";
+  ap.groups.B.name=$("#ccNameB").value.trim()||"Groupe B";
+  ap.groups.A.members=[...document.querySelectorAll("#ccGrpA .chip.on")].map(c=>c.dataset.id);
+  ap.groups.B.members=[...document.querySelectorAll("#ccGrpB .chip.on")].map(c=>c.dataset.id);
+  logActivity(`Cycle modifié : ${ap.name}`);
+  save(); closeModal(); renderPlanning(); toast("Configuration du cycle enregistrée");
+}
+
+/* --- Planning CRUD --- */
+function openNewPlanningModal(){
+  if(!isAdmin()) return;
+  showModal(`<h3>Nouveau planning</h3>
+    <div class="msub">Créez un nouveau planning pour votre service.</div>
+    <label>Nom du planning</label>
+    <input id="npName" class="fld" placeholder="Ex : Planning WE, Rotation Nuit…">
+    <label>Type de planning</label>
+    <div class="grid2" style="margin-top:6px">
+      <div class="chip on" data-type="standard" onclick="selPlanType(this)" style="text-align:center;padding:14px 8px">
+        <div style="font-size:20px;margin-bottom:4px">📋</div>
+        <div style="font-size:12px;font-weight:700">Perm / Astreinte</div>
+        <div style="font-size:10px;color:var(--ink-3);margin-top:2px">Créneaux configurables</div>
+      </div>
+      <div class="chip" data-type="cyclique" onclick="selPlanType(this)" style="text-align:center;padding:14px 8px">
+        <div style="font-size:20px;margin-bottom:4px">🔄</div>
+        <div style="font-size:12px;font-weight:700">Cyclique</div>
+        <div style="font-size:10px;color:var(--ink-3);margin-top:2px">Rotation 2 groupes</div>
+      </div>
+    </div>
+    <div class="btn-row"><button class="btn" onclick="createNewPlanning()">Créer</button></div>
+    <button class="btn sec" style="margin-top:9px;width:100%" onclick="closeModal()">Annuler</button>`);
+}
+
+function selPlanType(el){
+  el.parentElement.querySelectorAll(".chip").forEach(c=>c.classList.remove("on"));
+  el.classList.add("on");
+}
+
+function createNewPlanning(){
+  const name=$("#npName").value.trim();
+  if(!name){ toast("Entrez un nom pour le planning"); return; }
+  const typeEl=document.querySelector("#modalRoot .chip.on[data-type]");
+  const type=typeEl?typeEl.dataset.type:"standard";
+  const id=uid();
+  const planning={id,name,type};
+  if(type==="standard"){
+    planning.slots={permanence:{debut:"08:00",fin:"18:00",nb:1},astreinte:{debut:"18:00",fin:"08:00",nb:1}};
+    planning.events=[];
+  } else {
+    planning.cycleStart=ymd(new Date());
+    planning.cycleDays=7;
+    planning.groups={A:{name:"Groupe A",members:[]},B:{name:"Groupe B",members:[]}};
+  }
+  DB.plannings.push(planning);
+  DB.activePlanningId=id;
+  logActivity(`Nouveau planning créé : ${name} (${type})`);
+  save(); closeModal(); renderPlanning(); toast("Planning créé");
+}
+
+function openManagePlanningModal(){
+  if(!isAdmin()) return;
+  const ap=activePlanning(); if(!ap) return;
+  showModal(`<h3>Gérer : ${esc(ap.name)}</h3>
+    <label>Renommer</label>
+    <input id="mpName" class="fld" value="${esc(ap.name)}">
+    ${ap.type==="standard"?`
+    <label>Permanence — horaires</label><div class="grid2"><input id="mpPermD" type="time" class="fld" value="${ap.slots.permanence.debut}"><input id="mpPermF" type="time" class="fld" value="${ap.slots.permanence.fin}"></div>
+    <label>Permanence — nombre d'agents</label><input id="mpPermN" type="number" min="1" class="fld" value="${ap.slots.permanence.nb}">
+    <label>Astreinte — horaires</label><div class="grid2"><input id="mpAstrD" type="time" class="fld" value="${ap.slots.astreinte.debut}"><input id="mpAstrF" type="time" class="fld" value="${ap.slots.astreinte.fin}"></div>
+    <label>Astreinte — nombre d'agents</label><input id="mpAstrN" type="number" min="1" class="fld" value="${ap.slots.astreinte.nb}">
+    `:""}
+    <div class="btn-row">
+      <button class="btn" onclick="saveManagePlanning()">Enregistrer</button>
+      ${DB.plannings.length>1?`<button class="btn danger sm" onclick="deletePlanning()">Supprimer</button>`:""}
+    </div>
+    <button class="btn sec" style="margin-top:9px;width:100%" onclick="closeModal()">Annuler</button>`);
+}
+
+function saveManagePlanning(){
+  const ap=activePlanning(); if(!ap) return;
+  ap.name=$("#mpName").value.trim()||ap.name;
+  if(ap.type==="standard"){
+    ap.slots.permanence={debut:$("#mpPermD").value,fin:$("#mpPermF").value,nb:+$("#mpPermN").value||1};
+    ap.slots.astreinte={debut:$("#mpAstrD").value,fin:$("#mpAstrF").value,nb:+$("#mpAstrN").value||1};
+  }
+  save(); closeModal(); renderPlanning(); toast("Planning mis à jour");
+}
+
+function deletePlanning(){
+  if(DB.plannings.length<=1){ toast("Impossible : c'est le dernier planning"); return; }
+  if(!confirm("Supprimer ce planning et toutes ses données ?")) return;
+  const id=DB.activePlanningId;
+  DB.plannings=DB.plannings.filter(p=>p.id!==id);
+  DB.activePlanningId=DB.plannings[0].id;
+  logActivity("Planning supprimé");
+  save(); closeModal(); renderPlanning(); toast("Planning supprimé");
+}
+
+/* --- Events (scoped to active standard planning) --- */
 function openEventModal(id,presetDate){
   if(!isAdmin()) return;
-  const ev=id?DB.events.find(e=>e.id===id):null, date=ev?.date||presetDate||ymd(cursor), sel=new Set(ev?.agentIds||[]);
+  const ap=activePlanning(); if(!ap||ap.type!=="standard") return;
+  const ev=id?(ap.events||[]).find(e=>e.id===id):null, date=ev?.date||presetDate||ymd(cursor), sel=new Set(ev?.agentIds||[]);
   const typeOpts=Object.entries(TYPES).map(([k,v])=>`<option value="${k}" ${ev?.type===k?"selected":""}>${v.label}</option>`).join("");
   const chips=DB.agents.length?DB.agents.map(a=>`<span class="chip ${sel.has(a.id)?"on":""}" data-id="${a.id}">${esc(a.trigramme)} · ${esc(a.nom)}</span>`).join(""):`<span class="nofill">Aucun agent — ajoutez d'abord des effectifs.</span>`;
   showModal(`<h3>${id?"Modifier l'événement":"Nouvel événement"}</h3>
@@ -591,12 +874,14 @@ function openEventModal(id,presetDate){
     <button class="btn sec" style="margin-top:9px;width:100%" onclick="closeModal()">Annuler</button>`);
   bindChips("#evAgents");
 }
-function saveEvent(id){ const type=$("#evType").value,date=$("#evDate").value,agentIds=[...$("#evAgents").querySelectorAll(".chip.on")].map(c=>c.dataset.id);
+function saveEvent(id){ const ap=activePlanning(); if(!ap) return;
+  const type=$("#evType").value,date=$("#evDate").value,agentIds=[...$("#evAgents").querySelectorAll(".chip.on")].map(c=>c.dataset.id);
   if(!agentIds.length){ toast("Sélectionnez au moins un agent"); return; }
-  if(id) Object.assign(DB.events.find(e=>e.id===id),{type,date,agentIds}); else DB.events.push({id:uid(),type,date,agentIds});
+  if(id) Object.assign(ap.events.find(e=>e.id===id),{type,date,agentIds}); else ap.events.push({id:uid(),type,date,agentIds});
   logActivity(`Planning modifié : ${TYPES[type].label} le ${date}`);
   save(); closeModal(); renderPlanning(); toast("Événement enregistré"); }
-function delEvent(id){ DB.events=DB.events.filter(e=>e.id!==id); logActivity("Planning modifié (suppression)"); save(); closeModal(); renderPlanning(); toast("Supprimé"); }
+function delEvent(id){ const ap=activePlanning(); if(!ap) return;
+  ap.events=ap.events.filter(e=>e.id!==id); logActivity("Planning modifié (suppression)"); save(); closeModal(); renderPlanning(); toast("Supprimé"); }
 
 /* ===== MISSIONS ===== */
 function renderMissions(){
@@ -636,7 +921,7 @@ function drawMissions(){ const q=missionFilter.q.toLowerCase();
 }
 function openMissionModal(id){
   const m=id?DB.missions.find(x=>x.id===id):null, sel=new Set(m?.agentIds||[]);
-  const ro = !!id && !isAdmin();   // utilisateur : consultation seule des missions existantes
+  const ro = !!id && !isAdmin();
   const typeOpts=DB.missionTypes.map(t=>`<option ${m?.type===t?"selected":""}>${esc(t)}</option>`).join("");
   const chips=DB.agents.length?DB.agents.map(a=>`<span class="chip ${sel.has(a.id)?"on":""}" data-id="${a.id}" ${ro?'style="pointer-events:none;opacity:.7"':""}>${esc(a.trigramme)}</span>`).join(""):`<span class="nofill">Aucun agent enregistré.</span>`;
   const dis=ro?"disabled":"";
@@ -676,13 +961,14 @@ function addMt(){ const v=$("#mtNew").value.trim(); if(!v)return; if(DB.missionT
 function renameMt(i){ const n=prompt("Nouveau nom :",DB.missionTypes[i]); if(n&&n.trim()){DB.missionTypes[i]=n.trim();save();drawMt();} }
 function delMt(i){ DB.missionTypes.splice(i,1); save(); drawMt(); }
 
-/* ===== EFFECTIFS (admin) ===== */
+/* ===== EFFECTIFS ===== */
 function renderEffectifs(){
   if(!isAdmin()){ go("planning"); return; }
   const list=DB.agents.length?DB.agents.slice().sort((a,b)=>a.nom.localeCompare(b.nom)).map(a=>{
-    const nm=DB.missions.filter(m=>m.agentIds.includes(a.id)).length, ne=DB.events.filter(e=>e.agentIds.includes(a.id)).length;
+    const allEvts=DB.plannings.reduce((n,p)=>n+(p.events||[]).filter(e=>e.agentIds.includes(a.id)).length,0);
+    const nm=DB.missions.filter(m=>m.agentIds.includes(a.id)).length;
     return `<div class="item" onclick="openAgentModal('${a.id}')"><div class="badge" style="background:${triColor(a.trigramme)}">${esc(a.trigramme)}</div>
-      <div class="meta"><div class="nm">${esc(a.nom)} ${esc(a.prenom)}</div><div class="det">${nm} mission(s) · ${ne} événement(s)</div></div>
+      <div class="meta"><div class="nm">${esc(a.nom)} ${esc(a.prenom)}</div><div class="det">${nm} mission(s) · ${allEvts} événement(s)</div></div>
       <span class="chev">›</span></div>`; }).join("")
     :`<div class="empty"><svg class="ic" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="9" cy="8" r="3"/><path d="M4 20a5 5 0 0 1 10 0M16 6a3 3 0 0 1 0 6"/></svg>Aucun agent enregistré.<div class="sm">Bouton « + Agent » pour en ajouter un.</div></div>`;
   $("#view-effectifs").innerHTML=screenHead("Effectifs",`${DB.agents.length} agent(s)`,"+ Agent","openAgentModal()")+list;
@@ -703,10 +989,11 @@ function saveAgent(id){ const nom=$("#aNom").value.trim(),prenom=$("#aPrenom").v
   if(id) Object.assign(agentById(id),{nom,prenom,trigramme:tri}); else DB.agents.push({id:uid(),nom,prenom,trigramme:tri});
   save(); closeModal(); renderEffectifs(); toast("Agent enregistré"); }
 function delAgent(id){ if(!confirm("Supprimer cet agent du planning ?")) return;
-  DB.events=DB.events.filter(e=>{e.agentIds=e.agentIds.filter(x=>x!==id);return e.agentIds.length;});
+  DB.plannings.forEach(p=>{ if(p.events) p.events=p.events.filter(e=>{e.agentIds=e.agentIds.filter(x=>x!==id);return e.agentIds.length;}); 
+    if(p.groups){ ["A","B"].forEach(g=>{ if(p.groups[g]) p.groups[g].members=p.groups[g].members.filter(x=>x!==id); }); } });
   DB.agents=DB.agents.filter(a=>a.id!==id); save(); closeModal(); renderEffectifs(); toast("Agent supprimé"); }
 
-/* ===== RESSOURCES (véhicules & matériel) ===== */
+/* ===== RESSOURCES ===== */
 const vehById=id=>(DB.vehicles||[]).find(v=>v.id===id);
 function renderRessources(){
   const adm=isAdmin();
@@ -771,7 +1058,7 @@ function renderParams(){
     <button class="btn sec sm" onclick="exportSnapshot()">Vue de consultation</button>
     ${isAdmin()?`<button class="btn sec sm" onclick="exportJSON()">Sauvegarde</button><button class="btn sec sm" onclick="$('#impFile').click()">Restaurer</button>`:""}</div>
     <input type="file" id="impFile" accept=".json" class="hidden" onchange="importJSON(this)">
-    <div class="note">« Vue de consultation » génère une page lecture seule partageable (Excel = CSV). Un lien public en direct nécessite un hébergement (voir note de livraison).</div></div>`;
+    <div class="note">« Vue de consultation » génère une page lecture seule partageable (Excel = CSV).</div></div>`;
 
   if(!isAdmin()){
     $("#view-params").innerHTML=screenHead("Réglages","Préférences")+themeCard+accountCard+dataCard;
@@ -784,37 +1071,27 @@ function renderParams(){
     themeCard+
     `<div class="card"><h3>Service</h3><label>Nom du service</label><input id="pName" class="fld" value="${esc(DB.serviceName)}">
       <button class="btn sm dark" style="margin-top:12px" onclick="saveService()">Enregistrer</button></div>
-    <div class="card"><h3>Plages horaires & effectifs</h3>
-      <label>Permanence — horaires</label><div class="grid2"><input id="permD" type="time" class="fld" value="${DB.slots.permanence.debut}"><input id="permF" type="time" class="fld" value="${DB.slots.permanence.fin}"></div>
-      <label>Permanence — nombre d'agents</label><input id="permN" type="number" min="1" class="fld" value="${DB.slots.permanence.nb}">
-      <label>Astreinte — horaires</label><div class="grid2"><input id="astrD" type="time" class="fld" value="${DB.slots.astreinte.debut}"><input id="astrF" type="time" class="fld" value="${DB.slots.astreinte.fin}"></div>
-      <label>Astreinte — nombre d'agents</label><input id="astrN" type="number" min="1" class="fld" value="${DB.slots.astreinte.nb}">
-      <button class="btn sm dark" style="margin-top:12px" onclick="saveSlots()">Enregistrer</button></div>
     <div class="card"><h3>Couleurs des événements</h3>${crows}</div>
     <div class="card"><h3>Comptes & rôles</h3>
       <div class="note" style="margin:0 0 10px">Gérez les rôles et réinitialisez les mots de passe.</div>
       <div id="usersList"><button class="btn sec sm" onclick="loadUsers()">Charger les comptes</button></div></div>
     <div class="card"><h3>Lien de consultation (lecture seule)</h3>
-      <div class="note" style="margin:0 0 10px">Lien public pour consulter le planning sans compte (sans nom/prénom ni identifiants). À héberger via GitHub Pages — voir notice.</div>
+      <div class="note" style="margin:0 0 10px">Lien public pour consulter le planning sans compte.</div>
       <div class="tablebar"><button class="btn sec sm" onclick="shareGenerate()">Activer / régénérer</button>
       <button class="btn sec sm" onclick="shareShow()">Afficher le lien</button>
       <button class="btn sec sm" onclick="shareDisable()">Désactiver</button></div></div>`+
-    accountCard+dataCard+
-    `<div class="card"><h3>Évolutions</h3><div class="note">Notifications push (app fermée), lien public en direct, véhicules/matériel, réinitialisation par e-mail — voir note de livraison.</div></div>`;
+    accountCard+dataCard;
 }
 function setColor(k,v){ DB.colors[k]=v; save(); renderParams(); }
 function saveService(){ DB.serviceName=$("#pName").value.trim()||"Service"; $("#hdrSub").textContent=DB.serviceName; save(); toast("Enregistré"); }
-function saveSlots(){ DB.slots.permanence={debut:$("#permD").value,fin:$("#permF").value,nb:+$("#permN").value||1};
-  DB.slots.astreinte={debut:$("#astrD").value,fin:$("#astrF").value,nb:+$("#astrN").value||1}; save(); toast("Plages enregistrées"); }
 
-/* ----- lien public de consultation ----- */
+/* ----- lien public ----- */
 const PAGES_VIEWER="https://lejourdain.github.io/permanances/viewer.html";
 const shareLink=tok=>PAGES_VIEWER+"?t="+tok;
 function showShareModal(url){ showModal(`<h3>Lien de consultation</h3>
-  <div class="msub">Lecture seule. Toute personne disposant du lien peut consulter le planning (sans nom/prénom ni identifiants).</div>
+  <div class="msub">Lecture seule.</div>
   <input class="fld" readonly value="${esc(url)}" onclick="this.select()" style="font-family:var(--mono);font-size:12px">
   <div class="btn-row"><button class="btn" onclick="(navigator.clipboard&&navigator.clipboard.writeText('${esc(url)}'));toast('Lien copié')">Copier le lien</button></div>
-  <div class="note">Nécessite d'avoir activé GitHub Pages et ajouté <b>viewer.html</b> (voir notice). « Désactiver » révoque le lien immédiatement.</div>
   <button class="btn sec" style="margin-top:9px;width:100%" onclick="closeModal()">Fermer</button>`); }
 async function shareGenerate(){ if(!sb){ toast("Connexion requise"); return; }
   try{ const {data,error}=await sb.rpc("share_set",{p_enable:true}); if(error) throw error; showShareModal(shareLink(data));
@@ -827,7 +1104,7 @@ async function shareDisable(){ if(!sb){ toast("Connexion requise"); return; }
   try{ const {error}=await sb.rpc("share_set",{p_enable:false}); if(error) throw error; toast("Lien désactivé");
   }catch(e){ toast("Échec (droits ?)"); } }
 
-/* ----- compte : changer son mot de passe (Supabase Auth) ----- */
+/* ----- compte ----- */
 function openChangePwd(){ showModal(`<h3>Changer mon mot de passe</h3>
   <div class="msub">Vous êtes déjà connecté ; saisissez simplement le nouveau.</div>
   <label>Nouveau mot de passe</label><input id="cpNew" type="password" class="fld" placeholder="6 caractères min.">
@@ -839,7 +1116,6 @@ async function changePwd(){ const n=$("#cpNew").value;
   try{ const {error}=await sb.auth.updateUser({password:n}); if(error) throw error; closeModal(); toast("Mot de passe modifié");
   }catch(e){ toast("Échec : "+((e&&e.message)||"réessayez")); } }
 
-/* ----- compte : modifier son pseudo ----- */
 function openPseudo(){ showModal(`<h3>Mon pseudo / trigramme affiché</h3>
   <label>Pseudo</label><input id="psNew" class="fld" value="${esc(session.pseudo)}">
   <div class="btn-row"><button class="btn" onclick="savePseudo()">Enregistrer</button></div>
@@ -849,7 +1125,6 @@ async function savePseudo(){ const v=$("#psNew").value.trim(); if(!v){ toast("Ps
     session.pseudo=v; $("#hdrUser").textContent=v; closeModal(); toast("Pseudo mis à jour"); if(tab==="params") renderParams();
   }catch(e){ toast("Échec (réseau ?)"); } }
 
-/* ----- admin : comptes & rôles ----- */
 async function loadUsers(){ if(!sb){ toast("Connexion requise"); return; }
   const el=$("#usersList"); el.innerHTML="Chargement…";
   try{ const {data,error}=await sb.rpc("admin_list_users"); if(error) throw error;
@@ -861,23 +1136,25 @@ async function toggleRole(id,role){ const nr=role==="admin"?"user":"admin";
   try{ const {error}=await sb.rpc("admin_set_role",{p_target:id,p_role:nr}); if(error) throw error; toast("Rôle mis à jour"); loadUsers();
   }catch(e){ toast(/DERNIER_ADMIN/.test((e.message||"")+(e.code||""))?"Impossible : dernier administrateur":"Échec (droits ?)"); } }
 
-/* ===== EXPORTS / PARTAGE ===== */
+/* ===== EXPORTS ===== */
 function dl(name,content,mime){ const b=new Blob(["\ufeff"+content],{type:mime}),u=URL.createObjectURL(b),a=document.createElement("a");
   a.href=u; a.download=name; a.click(); setTimeout(()=>URL.revokeObjectURL(u),1500); toast("Fichier généré"); }
 const cell=s=>`"${String(s??"").replace(/"/g,'""')}"`;
 function exportMissionsCSV(){ const rows=[["Type","Date","Début","Fin","Lieu","OPJ","Véhicule","Agents","Commentaires"]];
   DB.missions.forEach(m=>rows.push([m.type,m.date,m.debut,m.fin,m.lieu,m.opj,(m.vehicleId&&vehById(m.vehicleId)?vehById(m.vehicleId).nom:""),m.agentIds.map(triOf).join(" "),m.comment]));
   dl("missions.csv",rows.map(r=>r.map(cell).join(";")).join("\r\n"),"text/csv"); }
-function exportPlanningCSV(){ const rows=[["Date","Type","Agents"]];
-  DB.events.slice().sort((a,b)=>a.date.localeCompare(b.date)).forEach(e=>rows.push([e.date,TYPES[e.type].label,e.agentIds.map(triOf).join(" ")]));
+function exportPlanningCSV(){ const rows=[["Planning","Date","Type","Agents"]];
+  DB.plannings.forEach(p=>{ if(p.type==="standard"&&p.events) p.events.slice().sort((a,b)=>a.date.localeCompare(b.date)).forEach(e=>rows.push([p.name,e.date,TYPES[e.type].label,e.agentIds.map(triOf).join(" ")])); });
   dl("planning.csv",rows.map(r=>r.map(cell).join(";")).join("\r\n"),"text/csv"); }
 function exportJSON(){ dl("sauvegarde-permanences.json",JSON.stringify(DB,null,2),"application/json"); }
 function importJSON(input){ const f=input.files[0]; if(!f)return; const r=new FileReader();
-  r.onload=()=>{ try{ DB=Object.assign(defaultDB(),JSON.parse(r.result)); save(); $("#hdrSub").textContent=DB.serviceName; toast("Restauré"); go(tab); }catch(e){ toast("Fichier invalide"); } }; r.readAsText(f); }
+  r.onload=()=>{ try{ DB=Object.assign(defaultDB(),JSON.parse(r.result)); migratePlannings(); save(); $("#hdrSub").textContent=DB.serviceName; toast("Restauré"); go(tab); }catch(e){ toast("Fichier invalide"); } }; r.readAsText(f); }
 
 function exportSnapshot(){
   const today=new Date(), end=addDays(today,30);
-  const evs=DB.events.filter(e=>{const d=parseYmd(e.date);return d>=parseYmd(ymd(today))&&d<=end;}).sort((a,b)=>a.date.localeCompare(b.date));
+  // Collect events from all standard plannings
+  const allEvts=[]; DB.plannings.forEach(p=>{ if(p.type==="standard"&&p.events) p.events.forEach(e=>allEvts.push(e)); });
+  const evs=allEvts.filter(e=>{const d=parseYmd(e.date);return d>=parseYmd(ymd(today))&&d<=end;}).sort((a,b)=>a.date.localeCompare(b.date));
   const miss=DB.missions.filter(m=>{const d=parseYmd(m.date);return d>=parseYmd(ymd(today))&&d<=end;}).sort((a,b)=>(a.date+(a.debut||"")).localeCompare(b.date+(b.debut||"")));
   const row=e=>`<tr><td>${esc(fmtLong(parseYmd(e.date)))}</td><td><span style="background:${colorOf(e.type)};color:#fff;padding:2px 7px;border-radius:3px;font-size:12px">${esc(TYPES[e.type].label)}</span></td><td>${esc(e.agentIds.map(triOf).join(", "))}</td></tr>`;
   const mrow=m=>`<tr><td>${esc(fmtLong(parseYmd(m.date)))}${m.debut?" "+esc(m.debut):""}</td><td>${esc(m.type)}</td><td>${esc(m.lieu||"")}</td><td>${esc(m.opj||"")}</td><td>${esc(m.agentIds.map(triOf).join(", "))}</td></tr>`;
